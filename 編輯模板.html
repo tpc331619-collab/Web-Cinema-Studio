@@ -2611,7 +2611,7 @@
           <button class="pop-btn edit-btn" id="btn-edit-mode" onclick="toggleEditMode()">✏️ 編輯</button>
           <button class="pop-btn save-btn" id="btn-save-html" onclick="saveUpdatedHtml()" title="直接原檔覆蓋儲存本機檔案 (Ctrl+S)" style="background:#0f766e; color:#ccfbf1; border:1.5px solid #14b8a6; font-weight:800; border-radius:6px; padding:4px 9px;">💾 存檔</button>
           <button class="pop-btn save-as-btn" id="btn-save-as-html" onclick="saveAsNewHtml()" title="另存為新的 HTML 檔案" style="background:#0369a1; color:#e0f2fe; border:1.5px solid #38bdf8; font-weight:800; border-radius:6px; padding:4px 9px;">📑 另存新檔</button>
-          <button class="pop-btn rec-btn" id="btn-record-video" onclick="toggleRecordVideo()" style="border-radius:6px; padding:4px 9px;">🔴 錄製</button>
+          <button class="pop-btn rec-btn" id="btn-record-video" onclick="toggleRecordVideo()" title="導出為 MP4 影片 (含聲音)" style="border-radius:6px; padding:4px 9px;">🎬 導出</button>
           <button class="pop-btn reload-btn" id="btn-reload-page" onclick="location.reload()" title="重新整理頁面 (載入最新變更)" style="background:#1e293b; color:#cbd5e1; border:1.5px solid #334155; font-weight:800; border-radius:6px; padding:4px 9px; cursor:pointer; display:inline-flex; align-items:center; gap:4px; transition:all 0.2s ease;">🔄 重整</button>
           <button class="pop-btn reset-btn" id="btn-reset-template" onclick="resetToDefaultScenes()" title="清除快取，還原為原始初始範本" style="background:#450a0a; color:#fecaca; border:1.5px solid #ef4444; font-weight:800; border-radius:6px; padding:4px 9px;">↺ 恢復範本</button>
         </div>
@@ -4916,6 +4916,14 @@
       pausePlayback();
       currentElapsedSec = totalDurationSec;
       updateTimecodeUI();
+      // 若處於導出狀態，全片播放完畢後自動結束導出並下載檔案
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        setTimeout(() => {
+          if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+          }
+        }, 500);
+      }
     }
   }
 
@@ -6003,27 +6011,36 @@
     try {
       // 檢測瀏覽器是否支援直接輸出標準 MP4 (H.264/AAC)
       let selectedMime = 'video/webm;codecs=vp9,opus';
-      let ext = 'webm';
-      if (MediaRecorder.isTypeSupported('video/mp4;codecs=avc1.42E01E,mp4a.40.2')) {
-        selectedMime = 'video/mp4;codecs=avc1.42E01E,mp4a.40.2';
+      let ext = 'mp4';
+      const mp4Formats = [
+        'video/mp4;codecs=avc1.42E01E,mp4a.40.2',
+        'video/mp4;codecs=avc1,mp4a.40.2',
+        'video/mp4;codecs=avc1',
+        'video/mp4;codecs=h264,aac',
+        'video/mp4'
+      ];
+      const matchedMp4 = mp4Formats.find(f => MediaRecorder.isTypeSupported(f));
+      if (matchedMp4) {
+        selectedMime = matchedMp4;
         ext = 'mp4';
-      } else if (MediaRecorder.isTypeSupported('video/mp4')) {
-        selectedMime = 'video/mp4';
-        ext = 'mp4';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp9,opus')) {
-        selectedMime = 'video/webm;codecs=vp9,opus';
-        ext = 'webm';
-      } else if (MediaRecorder.isTypeSupported('video/webm;codecs=vp8,opus')) {
-        selectedMime = 'video/webm;codecs=vp8,opus';
-        ext = 'webm';
       } else {
-        selectedMime = 'video/webm';
+        const webmFormats = [
+          'video/webm;codecs=vp9,opus',
+          'video/webm;codecs=vp8,opus',
+          'video/webm'
+        ];
+        selectedMime = webmFormats.find(f => MediaRecorder.isTypeSupported(f)) || 'video/webm';
         ext = 'webm';
       }
 
       const stream = await navigator.mediaDevices.getDisplayMedia({
         video: { frameRate: 60, displaySurface: 'browser' },
-        audio: true,
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+          channelCount: 2
+        },
         preferCurrentTab: true
       });
 
@@ -6079,8 +6096,10 @@
           renderCropLoop();
 
           const canvasStream = canvas.captureStream(60);
-          const aTrack = stream.getAudioTracks()[0];
-          if (aTrack) canvasStream.addTrack(aTrack);
+          const aTracks = stream.getAudioTracks();
+          if (aTracks.length > 0) {
+            aTracks.forEach(track => canvasStream.addTrack(track));
+          }
           finalStream = canvasStream;
         }
       }
@@ -6106,22 +6125,26 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'CinemaStudio_照片動畫錄影_' + targetType + '.' + ext;
+        const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        a.download = `CinemaStudio_導出影片_${dateStr}.${ext}`;
         a.click();
 
         if (recBtn) {
-          recBtn.textContent = '🔴 錄製';
+          recBtn.textContent = '🎬 導出';
           recBtn.classList.remove('recording');
         }
+        const floatingRecBtn = document.getElementById('floating-rec-btn');
+        if (floatingRecBtn) floatingRecBtn.style.display = 'none';
+
         document.body.classList.remove('is-recording-clean');
         if (targetElement) targetElement.classList.remove('is-recording-target');
         updateScreenScale();
         stream.getTracks().forEach(track => track.stop());
 
         if (ext === 'mp4') {
-          alert('🎉 影片已成功錄製並匯出為標準 MP4！可直接雙擊播放。');
+          alert('🎉 MP4 影片導出成功！\n\n已成功導出為標準 MP4 格式影片，包含完整畫面運鏡與背景音樂音效，可直接在 Windows Media Player、手機或剪輯軟體中播放！');
         } else {
-          alert('🎉 影片錄製完成並已下載！\n\n💡 播放提示：\n1. 直接拖入 Chrome / Edge 瀏覽器分頁即可立即高清播放！\n2. 桌面已放好【一鍵轉MP4.bat】，將影片拖進去 0.5 秒即可轉成 Windows 媒體播放器通用 MP4！');
+          alert('🎉 影片導出完成並已下載！\n\n💡 格式提示：\n瀏覽器已導出高畫質 WebM 影片（直接拖入 Chrome / Edge 即可播放）。\n若需要轉為通用 MP4，可直接將檔案拖入專案資料夾中的【一鍵轉MP4影片.bat】，0.5 秒即可秒轉！');
         }
       };
 
@@ -6139,9 +6162,11 @@
 
       mediaRecorder.start(1000);
       if (recBtn) {
-        recBtn.textContent = '⏹ 停止錄影';
+        recBtn.textContent = '⏹ 停止導出';
         recBtn.classList.add('recording');
       }
+      const floatingRecBtn = document.getElementById('floating-rec-btn');
+      if (floatingRecBtn) floatingRecBtn.style.display = 'block';
 
       // 自動從頭開始播放錄製
       pausePlayback();
@@ -6151,11 +6176,13 @@
       }, 600);
 
     } catch (err) {
-      console.warn('錄影啟動取消或不支援:', err);
+      console.warn('導出啟動取消或不支援:', err);
       if (recBtn) {
-        recBtn.textContent = '🔴 錄製';
+        recBtn.textContent = '🎬 導出';
         recBtn.classList.remove('recording');
       }
+      const floatingRecBtn = document.getElementById('floating-rec-btn');
+      if (floatingRecBtn) floatingRecBtn.style.display = 'none';
       document.body.classList.remove('is-recording-clean');
       if (targetElement) targetElement.classList.remove('is-recording-target');
     }
@@ -6973,7 +7000,7 @@
   window.playTypewriterClick = playTypewriterClick;
 
 </script>
-<button id="floating-rec-btn" class="pop-floating-rec-btn" onclick="toggleRecordVideo()" title="錄製完成點擊此處結束並下載">⏹ 停止錄製並下載</button>
+<button id="floating-rec-btn" class="pop-floating-rec-btn" onclick="toggleRecordVideo()" title="導出完成點擊此處結束並下載 MP4">⏹ 結束導出並下載 MP4</button>
 
 
 
@@ -7036,18 +7063,18 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
   </div>
 
 
-  <!-- 🎥 自選錄影範圍彈出視窗 (Modal) -->
+  <!-- 🎬 自選導出範圍彈出視窗 (Modal) -->
   <div class="live-modal-backdrop" id="modal-record-range" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:999999; align-items:center; justify-content:center;" onclick="if(event.target===this) closeRecordRangeModal()">
     <div style="width:480px; max-width:94vw; background:#0f172a; border:1px solid #3f3f46; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.85); padding:22px; color:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #334155; padding-bottom:10px;">
         <span style="font-size:1.12rem; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px;">
-          🎥 選擇錄製影片範圍
+          🎬 導出影片 (MP4 格式 · 含聲音)
         </span>
         <button style="background:transparent; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 4px;" onclick="closeRecordRangeModal()">✕</button>
       </div>
 
       <div style="font-size:0.84rem; color:#cbd5e1; margin-bottom:14px; line-height:1.5;">
-        請選擇您要匯出錄製的畫面區域：
+        請選擇您要導出的畫面範圍（包含運鏡、字幕、背景音樂與音效）：
       </div>
 
       <!-- 選項列表 -->
@@ -7057,11 +7084,11 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
           <input type="radio" name="rec-range-choice" value="stage" checked style="margin-top:3px; accent-color:#ffffff; cursor:pointer;">
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:8px;">
-              <b style="color:#ffffff; font-size:0.95rem;">🎯 核心相片動畫畫布 (純淨動態畫面)</b>
-              <span style="background:#ffffff; color:#000000; font-weight:800; font-size:0.68rem; font-weight:800; padding:1px 6px; border-radius:4px;">推薦</span>
+              <b style="color:#ffffff; font-size:0.95rem;">🎯 核心相片動畫畫布 (純淨畫面 · 推薦)</b>
+              <span style="background:#ffffff; color:#000000; font-weight:800; font-size:0.68rem; padding:1px 6px; border-radius:4px;">推薦</span>
             </div>
             <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px; line-height:1.4;">
-              僅錄製中央相片運鏡畫面、指示框標籤、滑鼠軌跡與底部字幕。自動切除上方控制按鈕列與多餘黑邊。
+              僅導出中央相片運鏡畫面、指示框標籤、滑鼠軌跡與底部字幕，自動切除上方工具列與邊框。
             </div>
           </div>
         </label>
@@ -7083,7 +7110,7 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
           <div style="flex:1;">
             <b style="color:#ffffff; font-size:0.95rem;">🖥️ 整個分頁 / 視窗 (全螢幕不裁切)</b>
             <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px; line-height:1.4;">
-              原生錄製模式，完整收錄瀏覽器分頁畫面。
+              完整導出整個瀏覽器分頁畫面。
             </div>
           </div>
         </label>
@@ -7091,13 +7118,13 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
 
       <!-- 提示條 -->
       <div style="background:rgba(56, 189, 248, 0.1); border:1px solid rgba(56, 189, 248, 0.3); border-radius:8px; padding:9px 12px; margin-bottom:18px; font-size:0.75rem; color:#bae6fd; line-height:1.5;">
-        💡 <b>重要小提示：</b>點擊開始後，在瀏覽器跳出的分享視窗中選擇<b>「此分頁」</b>並確認<b>「分享音訊」</b>已勾選，錄影將自動從片頭從頭播放錄製！
+        💡 <b>重要聲音導出提醒：</b>點擊開始後，在瀏覽器跳出的視窗中選取<b>「此分頁」</b>並確認<b>「分享分頁音訊」</b>已勾選，導出將自動從頭播放，整段播完自動生成 MP4 下載！
       </div>
 
       <!-- 動作按鈕 -->
       <div style="display:flex; justify-content:flex-end; gap:10px;">
         <button style="background:#334155; color:#cbd5e1; border:none; padding:8px 16px; border-radius:8px; font-weight:800; cursor:pointer;" onclick="closeRecordRangeModal()">取消</button>
-        <button style="background:linear-gradient(135deg, #ef4444, #dc2626); color:#fff; border:none; padding:8px 24px; border-radius:8px; font-weight:900; font-size:0.95rem; cursor:pointer; box-shadow:0 4px 14px rgba(239,68,68,0.45);" onclick="confirmStartRecording()">🔴 開始錄製</button>
+        <button style="background:linear-gradient(135deg, #0284c7, #0369a1); color:#fff; border:none; padding:8px 24px; border-radius:8px; font-weight:900; font-size:0.95rem; cursor:pointer; box-shadow:0 4px 14px rgba(2,132,199,0.45);" onclick="confirmStartRecording()">⚡ 開始導出 MP4</button>
       </div>
     </div>
   </div>
