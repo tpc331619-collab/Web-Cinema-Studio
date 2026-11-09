@@ -1983,6 +1983,61 @@
     line-height: 1.45 !important;
   }
 
+  /* 9:16 直向與 1:1 畫幅自適應精緻字幕 (緊貼相片畫面下方，寬度比例自適應) */
+  body.ratio-9-16 .pop-subtitle-wrap {
+    position: absolute !important;
+    bottom: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 90% !important;
+    max-width: 92% !important;
+  }
+  body.ratio-9-16 .pop-subtitle-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: unset !important;
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+  }
+  body.ratio-9-16 .pop-subtitle-text,
+  body.ratio-9-16 .pop-sub-kw {
+    font-size: 0.74rem !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+    text-align: center !important;
+  }
+  body.ratio-9-16 .pop-subtitle-card.size-small .pop-subtitle-text,
+  body.ratio-9-16 .pop-subtitle-card.size-small .pop-sub-kw {
+    font-size: 0.68rem !important;
+  }
+  body.ratio-9-16 .pop-subtitle-card.size-large .pop-subtitle-text,
+  body.ratio-9-16 .pop-subtitle-card.size-large .pop-sub-kw {
+    font-size: 0.82rem !important;
+  }
+
+  body.ratio-1-1 .pop-subtitle-wrap {
+    position: absolute !important;
+    bottom: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 86% !important;
+    max-width: 88% !important;
+  }
+  body.ratio-1-1 .pop-subtitle-card {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    min-width: unset !important;
+    padding: 6px 12px !important;
+    border-radius: 8px !important;
+  }
+  body.ratio-1-1 .pop-subtitle-text,
+  body.ratio-1-1 .pop-sub-kw {
+    font-size: 0.76rem !important;
+    line-height: 1.4 !important;
+    word-break: break-word !important;
+    text-align: center !important;
+  }
+
   @media (max-width: 600px) {
     .pop-subtitle-card {
       min-width: auto !important;
@@ -5454,6 +5509,8 @@
     if (fb) fb.setAttribute('style', 'transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1), top 0.8s cubic-bezier(0.22, 1, 0.36, 1), width 0.8s, height 0.8s, opacity 0.3s;');
     const mc = docClone.querySelector('#mock-cursor');
     if (mc) mc.removeAttribute('style');
+    const sw = docClone.querySelector('.pop-subtitle-wrap');
+    if (sw) sw.removeAttribute('style');
 
     return docClone.outerHTML;
   }
@@ -6193,6 +6250,9 @@
   function setAspectRatio(ratio) {
     CURRENT_ASPECT_RATIO = ratio;
     try { localStorage.setItem('WCS_ASPECT_RATIO', ratio); } catch(e){}
+    document.body.classList.toggle('ratio-9-16', ratio === '9:16');
+    document.body.classList.toggle('ratio-1-1', ratio === '1:1');
+    document.body.classList.toggle('ratio-16-9', ratio === '16:9');
     ['16-9', '9-16', '1-1'].forEach(r => {
       const btn = document.getElementById('btn-aspect-' + r);
       if (!btn) return;
@@ -6226,11 +6286,12 @@
     const isMobile = window.innerWidth <= 768;
     const titlebarH = isMobile ? 26 : 38;
 
+    let w = 0, h = 0;
     if (isMobile) {
       const padW = 12;
       const maxW = Math.min(window.innerWidth - padW, CURRENT_ASPECT_RATIO === '9:16' ? 320 : 460);
-      const w = Math.floor(maxW);
-      const h = Math.floor(w * (aspectH / aspectW));
+      w = Math.floor(maxW);
+      h = Math.floor(w * (aspectH / aspectW));
       shell.style.width = w + 'px';
       shell.style.height = (h + titlebarH) + 'px';
       vp.style.width = w + 'px';
@@ -6256,8 +6317,8 @@
 
       // 依據比例約束尺寸
       const maxWFromH = (availH - titlebarH) * (aspectW / aspectH);
-      const w = Math.floor(Math.min(availW, maxWFromH));
-      const h = Math.floor(w * (aspectH / aspectW));
+      w = Math.floor(Math.min(availW, maxWFromH));
+      h = Math.floor(w * (aspectH / aspectW));
 
       shell.style.width = w + 'px';
       shell.style.height = (h + titlebarH) + 'px';
@@ -6265,6 +6326,23 @@
       vp.style.height = h + 'px';
       const scale = w / baseVirtualW;
       document.documentElement.style.setProperty('--screen-scale', scale);
+    }
+
+    // 依據畫幅比例動態調整字幕卡片垂直定位 (9:16 與 1:1 精確貼齊相片內容正下方，避免脫節落於底框)
+    const subWrap = document.querySelector('.pop-subtitle-wrap');
+    if (subWrap) {
+      if (CURRENT_ASPECT_RATIO === '9:16' || CURRENT_ASPECT_RATIO === '1:1') {
+        const mw = document.getElementById('motion-world');
+        const mwH = (mw && mw.offsetHeight > 0) ? mw.offsetHeight : Math.floor(w * 9 / 16);
+        const subH = subWrap.offsetHeight || 44;
+        const maxTop = Math.max(12, h - subH - 12);
+        const targetTop = Math.min(mwH + 12, maxTop);
+        subWrap.style.setProperty('top', targetTop + 'px', 'important');
+        subWrap.style.setProperty('bottom', 'auto', 'important');
+      } else {
+        subWrap.style.setProperty('top', 'auto', 'important');
+        subWrap.style.setProperty('bottom', '12px', 'important');
+      }
     }
   }
 
@@ -6274,6 +6352,8 @@
     window.addEventListener('DOMContentLoaded', () => {
       const main = document.querySelector('.pop-main-area');
       if (main) ro.observe(main);
+      const mw = document.getElementById('motion-world');
+      if (mw) ro.observe(mw);
     });
   }
 
