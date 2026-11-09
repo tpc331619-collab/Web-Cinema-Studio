@@ -5069,7 +5069,6 @@
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name));
     if (files.length === 0) return;
 
-    const kenburnsSequence = ['zoom-in', 'pan-left', 'zoom-out', 'pan-right', 'diagonal', 'tilt-up'];
     const addedCount = files.length;
     const startIndex = SCENES.length;
 
@@ -5093,8 +5092,7 @@
         subtitles: [cleanTitle],
         steps: [
           {
-            cam: [1.25, 0, 0],
-            fromCam: [1.0, 0, 0],
+            cam: [1.0, 0, 0],
             box: [0, 0, 0, 0],
             hideBox: true,
             hideCursor: true,
@@ -5106,15 +5104,13 @@
         ]
       };
       SCENES.push(newScene);
-      const preset = kenburnsSequence[i % kenburnsSequence.length];
-      applyKenBurnsPreset(preset, SCENES.length - 1);
     }
 
     renderTimelineRail();
     loadStep(startIndex, 0, false);
     if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
     if (typeof showScriptToast === 'function') {
-      showScriptToast(`🎉 成功拖入 ${addedCount} 張照片！已自動分配電影級運鏡！`);
+      showScriptToast(`🎉 成功拖入 ${addedCount} 張照片！`);
     }
   }
 
