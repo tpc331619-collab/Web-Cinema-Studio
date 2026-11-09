@@ -1253,10 +1253,15 @@
   }
 
   /* 非編輯模式下：大畫面置中 + 字幕正常呼吸顯示 */
-  body:not(.is-editing) #edit-drawer,
-  body:not(.is-editing) #studio-resizer,
-  body:not(.is-editing) #capcut-timeline-shelf {
-    display: none !important;
+  /* 永久工作區：抽屜與時間軸永遠常駐展示，絕不隱藏蒸發 */
+  #edit-drawer {
+    display: flex !important;
+  }
+  #capcut-timeline-shelf {
+    display: block !important;
+  }
+  #studio-resizer {
+    display: flex !important;
   }
   body:not(.is-editing) .pop-studio-workspace {
     display: flex !important;
@@ -2554,7 +2559,7 @@
           <button class="pop-tab-btn" onclick="switchDrawerTab('media')" style="border-radius:6px !important; padding:4px 12px !important; font-size:0.75rem !important; font-weight:800 !important; cursor:pointer !important;">📁 換圖與插片</button>
         </div>
         <div style="display:flex; align-items:center;">
-          <button class="pop-btn" style="padding:4px 10px !important; font-size:0.72rem !important; background:#1e293b !important; color:#cbd5e1 !important; border:1px solid #334155 !important; border-radius:6px !important; font-weight:800 !important; cursor:pointer !important;" onclick="toggleEditMode()" title="關閉編輯面板">✕ 關閉</button>
+          <button class="pop-btn" id="btn-drawer-collapse" style="padding:4px 10px !important; font-size:0.8rem !important; background:#18181b !important; color:#d4d4d8 !important; border:1px solid #3f3f46 !important; border-radius:6px !important; font-weight:700 !important; cursor:pointer !important;" onclick="toggleDrawerCollapse()" title="收合/展開側邊控制面板">◀ 收合</button>
         </div>
       </div>
 
@@ -4067,7 +4072,30 @@
     }
   }
 
+  
+  // 專業相片工作區：只收合側邊抽屜，時間軸永遠常駐
+  let isDrawerCollapsed = false;
+  function toggleDrawerCollapse() {
+    const drawer = document.getElementById('edit-drawer');
+    const btn = document.getElementById('btn-drawer-collapse');
+    if (!drawer) return;
+    isDrawerCollapsed = !isDrawerCollapsed;
+    if (isDrawerCollapsed) {
+      drawer.style.display = 'none';
+      if (btn) btn.textContent = '▶ 展開';
+    } else {
+      drawer.style.display = 'flex';
+      if (btn) btn.textContent = '◀ 收合';
+    }
+    updateScreenScale();
+  }
+
+  // 頂部編輯鈕改造為快捷聚焦
   function toggleEditMode() {
+    toggleDrawerCollapse();
+  }
+
+  function _old_toggleEditMode() {
     editMode = !editMode;
     document.body.classList.toggle('is-editing', editMode);
     const editBtn = document.getElementById('btn-edit-mode');
