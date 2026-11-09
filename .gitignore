@@ -1,0 +1,17 @@
+# OS / Editor Artifacts
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp
+*.log
+
+# Video / Large recording outputs
+*.webm
+*.mp4
+!images/**/*.jpg
+!images/**/*.png
+!images/**/*.jpeg
+
+# VSCode / IDE
+.vscode/
+.idea/
