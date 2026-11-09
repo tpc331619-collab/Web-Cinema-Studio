@@ -2245,13 +2245,16 @@
   .pop-focus-box {
     position: absolute !important;
     box-sizing: border-box !important;
-    border: 2px solid #ffffff !important;
-    outline: 1px solid rgba(0,0,0,0.6) !important;
-    border-radius: 4px !important;
-    box-shadow: 0 0 16px rgba(0,0,0,0.6), inset 0 0 0 1px rgba(0,0,0,0.4) !important;
+    border-style: solid !important;
+    border-width: 3.5px;
+    border-color: #ef4444;
+    border-radius: 4px;
+    box-shadow: 0 0 16px rgba(239, 68, 68, 0.5), inset 0 0 8px rgba(239, 68, 68, 0.2);
     pointer-events: auto !important;
     cursor: move !important;
     z-index: 80 !important;
+    user-select: none !important;
+    touch-action: none !important;
     display: none;
     opacity: 0;
   }
@@ -2263,26 +2266,42 @@
     position: absolute !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
-    padding: 2px 8px !important;
-    font-size: 0.72rem !important;
+    padding: 3px 10px !important;
+    font-size: 0.72rem;
     font-weight: 700 !important;
-    color: #ffffff !important;
-    background: rgba(18, 18, 20, 0.92) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    border-radius: 4px !important;
+    color: #ffffff;
+    background: #ef4444;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
     white-space: nowrap !important;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
-    backdrop-filter: blur(4px) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
     pointer-events: none !important;
+    user-select: none !important;
   }
   .pop-box-handle {
-    width: 8px !important;
-    height: 8px !important;
+    position: absolute !important;
+    width: 12px !important;
+    height: 12px !important;
     background: #ffffff !important;
-    border: 1px solid #000000 !important;
+    border: 1.5px solid #09090b !important;
     border-radius: 2px !important;
     box-shadow: 0 1px 4px rgba(0,0,0,0.6) !important;
+    z-index: 120 !important;
+    pointer-events: auto !important;
+    touch-action: none !important;
+    transition: transform 0.1s ease, background 0.1s ease;
   }
+  .pop-box-handle:hover,
+  .pop-box-handle:active {
+    transform: scale(1.35) !important;
+    background: #0ea5e9 !important;
+    border-color: #ffffff !important;
+  }
+  .pop-box-handle.handle-tl { left: -6px !important; top: -6px !important; cursor: nwse-resize !important; }
+  .pop-box-handle.handle-tr { right: -6px !important; top: -6px !important; cursor: nesw-resize !important; }
+  .pop-box-handle.handle-bl { left: -6px !important; bottom: -6px !important; cursor: nesw-resize !important; }
+  .pop-box-handle.handle-br { right: -6px !important; bottom: -6px !important; cursor: nwse-resize !important; }
 
 
   /* ================= 專業影音時間軸對齊與字級規範 (CapCut/Premiere Style) ================= */
@@ -2890,8 +2909,11 @@
 
             <!-- 2D 紅色重點指示框 (可拖曳縮放) -->
             <div class="pop-focus-box" id="focus-box" style="display:none;">
-              <div class="pop-focus-tag" id="focus-tag" style="display:none;"></div>
-              <div class="pop-box-handle" id="box-handle"></div>
+              <span class="pop-focus-tag" id="focus-tag" style="display:none;"></span>
+              <div class="pop-box-handle handle-tl" data-handle="tl" title="縮放 (左上)"></div>
+              <div class="pop-box-handle handle-tr" data-handle="tr" title="縮放 (右上)"></div>
+              <div class="pop-box-handle handle-bl" data-handle="bl" title="縮放 (左下)"></div>
+              <div class="pop-box-handle handle-br" id="box-handle" data-handle="br" title="縮放 (右下)"></div>
             </div>
 
             <!-- 模擬滑鼠大白手套/箭頭 -->
@@ -3364,6 +3386,146 @@
         }
       }
     });
+  }
+
+  // ================= 🔲 指示框全功能互動引擎 (畫布自由拖曳移位、四角手柄精準縮放) =================
+  let isDraggingBox = false;
+  let isResizingBox = false;
+  let activeResizeHandle = null;
+  let boxDragStartX = 0, boxDragStartY = 0;
+  let boxStartLeft = 0, boxStartTop = 0, boxStartW = 0, boxStartH = 0;
+
+  function initFocusBoxDragAndResizeEvents() {
+    if (!focusBox) return;
+
+    // 1. 移動拖曳 (點擊指示框主體)
+    focusBox.addEventListener('pointerdown', (e) => {
+      if (e.target.classList.contains('pop-box-handle')) return;
+      if (e.button !== 0) return;
+
+      isDraggingBox = true;
+      focusBox.style.cursor = 'grabbing';
+      focusBox.style.transition = 'none';
+
+      boxDragStartX = e.clientX;
+      boxDragStartY = e.clientY;
+      boxStartLeft = parseFloat(focusBox.style.left) || 20;
+      boxStartTop = parseFloat(focusBox.style.top) || 20;
+
+      try { focusBox.setPointerCapture(e.pointerId); } catch(err) {}
+      e.stopPropagation();
+      e.preventDefault();
+    });
+
+    // 2. 四角手柄縮放拖曳
+    focusBox.querySelectorAll('.pop-box-handle').forEach(h => {
+      h.addEventListener('pointerdown', (e) => {
+        if (e.button !== 0) return;
+        isResizingBox = true;
+        activeResizeHandle = h.dataset.handle || 'br';
+        focusBox.style.transition = 'none';
+
+        boxDragStartX = e.clientX;
+        boxDragStartY = e.clientY;
+        boxStartLeft = parseFloat(focusBox.style.left) || 20;
+        boxStartTop = parseFloat(focusBox.style.top) || 20;
+        boxStartW = parseFloat(focusBox.style.width) || 40;
+        boxStartH = parseFloat(focusBox.style.height) || 40;
+
+        try { h.setPointerCapture(e.pointerId); } catch(err) {}
+        e.stopPropagation();
+        e.preventDefault();
+      });
+    });
+
+    // 3. 全域移動計算 (利用 motionWorld.getBoundingClientRect 保持百分比零誤差)
+    window.addEventListener('pointermove', (e) => {
+      if (!isDraggingBox && !isResizingBox) return;
+      if (!motionWorld) return;
+      const mwRect = motionWorld.getBoundingClientRect();
+      if (!mwRect.width || !mwRect.height) return;
+
+      if (isDraggingBox) {
+        const dx = ((e.clientX - boxDragStartX) / mwRect.width) * 100;
+        const dy = ((e.clientY - boxDragStartY) / mwRect.height) * 100;
+
+        const w = parseFloat(focusBox.style.width) || 40;
+        const h = parseFloat(focusBox.style.height) || 40;
+
+        const nx = Math.max(0, Math.min(100 - w, boxStartLeft + dx));
+        const ny = Math.max(0, Math.min(100 - h, boxStartTop + dy));
+
+        focusBox.style.left = nx.toFixed(2) + '%';
+        focusBox.style.top = ny.toFixed(2) + '%';
+      } else if (isResizingBox) {
+        const dx = ((e.clientX - boxDragStartX) / mwRect.width) * 100;
+        const dy = ((e.clientY - boxDragStartY) / mwRect.height) * 100;
+        const minSize = 4;
+
+        let l = boxStartLeft;
+        let t = boxStartTop;
+        let w = boxStartW;
+        let h = boxStartH;
+
+        if (activeResizeHandle === 'br') {
+          w = Math.max(minSize, Math.min(100 - l, boxStartW + dx));
+          h = Math.max(minSize, Math.min(100 - t, boxStartH + dy));
+        } else if (activeResizeHandle === 'tr') {
+          w = Math.max(minSize, Math.min(100 - l, boxStartW + dx));
+          const maxDeltaY = boxStartH - minSize;
+          const clampedDy = Math.max(-boxStartTop, Math.min(maxDeltaY, dy));
+          t = boxStartTop + clampedDy;
+          h = boxStartH - clampedDy;
+        } else if (activeResizeHandle === 'bl') {
+          const maxDeltaX = boxStartW - minSize;
+          const clampedDx = Math.max(-boxStartLeft, Math.min(maxDeltaX, dx));
+          l = boxStartLeft + clampedDx;
+          w = boxStartW - clampedDx;
+          h = Math.max(minSize, Math.min(100 - t, boxStartH + dy));
+        } else if (activeResizeHandle === 'tl') {
+          const maxDeltaX = boxStartW - minSize;
+          const clampedDx = Math.max(-boxStartLeft, Math.min(maxDeltaX, dx));
+          l = boxStartLeft + clampedDx;
+          w = boxStartW - clampedDx;
+
+          const maxDeltaY = boxStartH - minSize;
+          const clampedDy = Math.max(-boxStartTop, Math.min(maxDeltaY, dy));
+          t = boxStartTop + clampedDy;
+          h = boxStartH - clampedDy;
+        }
+
+        focusBox.style.left = l.toFixed(2) + '%';
+        focusBox.style.top = t.toFixed(2) + '%';
+        focusBox.style.width = w.toFixed(2) + '%';
+        focusBox.style.height = h.toFixed(2) + '%';
+      }
+    });
+
+    // 4. 全域釋放並存檔
+    const handlePointerUp = () => {
+      if (isDraggingBox || isResizingBox) {
+        if (isDraggingBox) {
+          isDraggingBox = false;
+          focusBox.style.cursor = 'move';
+        }
+        isResizingBox = false;
+        activeResizeHandle = null;
+
+        const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
+        if (step) {
+          step.box = [
+            parseFloat(parseFloat(focusBox.style.left).toFixed(2)),
+            parseFloat(parseFloat(focusBox.style.top).toFixed(2)),
+            parseFloat(parseFloat(focusBox.style.width).toFixed(2)),
+            parseFloat(parseFloat(focusBox.style.height).toFixed(2))
+          ];
+          autoSaveToStorage();
+        }
+      }
+    };
+
+    window.addEventListener('pointerup', handlePointerUp);
+    window.addEventListener('pointercancel', handlePointerUp);
   }
 
 
@@ -3870,6 +4032,9 @@
         btn.style.borderColor = '#10b981';
       }
     }
+
+    // 同步自訂樣式至指示框與左側控制項
+    applyBoxStyleToDOM(step.boxStyle || {});
   }
 
   function handleTagEdited(val) {
@@ -3904,44 +4069,62 @@
   function applyBoxStyleToDOM(st = {}) {
     if (!focusBox) return;
     const borderColor = st.borderColor || '#ef4444';
-    const borderWidth = st.borderWidth || '2.5px';
-    focusBox.style.borderColor = borderColor;
-    focusBox.style.borderWidth = borderWidth;
-    focusBox.style.boxShadow = `0 0 16px ${borderColor}88, inset 0 0 10px ${borderColor}33`;
+    const borderWidth = st.borderWidth || '3.5px';
+    focusBox.style.setProperty('border-color', borderColor, 'important');
+    focusBox.style.setProperty('border-width', borderWidth, 'important');
+    focusBox.style.setProperty('border-style', 'solid', 'important');
+    focusBox.style.setProperty('box-shadow', `0 0 16px ${borderColor}88, inset 0 0 10px ${borderColor}33`, 'important');
 
     if (focusTag) {
       const tagBg = st.tagBg || borderColor;
-      const tagColor = st.tagColor === 'dark' ? '#0f172a' : '#ffffff';
+      const tagColor = (st.tagColor === 'dark' || st.tagColor === '#0f172a') ? '#0f172a' : (st.tagColor || '#ffffff');
       const tagSize = st.tagSize || '13px';
-      focusTag.style.background = tagBg;
-      focusTag.style.color = tagColor;
-      focusTag.style.fontSize = tagSize;
-      focusTag.style.border = `1px solid ${tagColor === '#ffffff' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'}`;
+      focusTag.style.setProperty('background', tagBg, 'important');
+      focusTag.style.setProperty('color', tagColor, 'important');
+      focusTag.style.setProperty('font-size', tagSize, 'important');
+      focusTag.style.setProperty('border', `1px solid ${tagColor === '#ffffff' ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)'}`, 'important');
 
       const tagPos = st.tagPos || 'top-outer';
       focusTag.className = `pop-focus-tag pos-${tagPos}`;
       if (tagPos === 'top-outer') {
-        focusTag.style.top = '-26px';
-        focusTag.style.bottom = 'auto';
-        focusTag.style.left = '50%';
-        focusTag.style.transform = 'translateX(-50%)';
+        focusTag.style.setProperty('top', '-28px', 'important');
+        focusTag.style.setProperty('bottom', 'auto', 'important');
+        focusTag.style.setProperty('left', '50%', 'important');
+        focusTag.style.setProperty('transform', 'translateX(-50%)', 'important');
       } else if (tagPos === 'bottom-outer') {
-        focusTag.style.top = 'auto';
-        focusTag.style.bottom = '-26px';
-        focusTag.style.left = '50%';
-        focusTag.style.transform = 'translateX(-50%)';
+        focusTag.style.setProperty('top', 'auto', 'important');
+        focusTag.style.setProperty('bottom', '-28px', 'important');
+        focusTag.style.setProperty('left', '50%', 'important');
+        focusTag.style.setProperty('transform', 'translateX(-50%)', 'important');
       } else if (tagPos === 'top-inner') {
-        focusTag.style.top = '4px';
-        focusTag.style.bottom = 'auto';
-        focusTag.style.left = '50%';
-        focusTag.style.transform = 'translateX(-50%)';
+        focusTag.style.setProperty('top', '6px', 'important');
+        focusTag.style.setProperty('bottom', 'auto', 'important');
+        focusTag.style.setProperty('left', '50%', 'important');
+        focusTag.style.setProperty('transform', 'translateX(-50%)', 'important');
       } else if (tagPos === 'bottom-inner') {
-        focusTag.style.top = 'auto';
-        focusTag.style.bottom = '4px';
-        focusTag.style.left = '50%';
-        focusTag.style.transform = 'translateX(-50%)';
+        focusTag.style.setProperty('top', 'auto', 'important');
+        focusTag.style.setProperty('bottom', '6px', 'important');
+        focusTag.style.setProperty('left', '50%', 'important');
+        focusTag.style.setProperty('transform', 'translateX(-50%)', 'important');
       }
     }
+
+    // 雙向同步左側面板表單控件
+    try {
+      const pBox = document.getElementById('picker-box-color');
+      if (pBox && borderColor.startsWith('#')) pBox.value = borderColor;
+      const pTagBg = document.getElementById('picker-tag-bg');
+      const curBg = st.tagBg || borderColor;
+      if (pTagBg && curBg.startsWith('#')) pTagBg.value = curBg;
+      const sWidth = document.getElementById('sel-border-width');
+      if (sWidth && st.borderWidth) sWidth.value = st.borderWidth;
+      const sPos = document.getElementById('sel-tag-pos');
+      if (sPos && st.tagPos) sPos.value = st.tagPos;
+      const sColor = document.getElementById('sel-tag-color');
+      if (sColor && st.tagColor) sColor.value = st.tagColor;
+      const sSize = document.getElementById('sel-tag-size');
+      if (sSize && st.tagSize) sSize.value = st.tagSize;
+    } catch(err) {}
   }
 
   function getCurrentBoxStyle() {
@@ -5096,14 +5279,12 @@
             localStorage.removeItem('WCS_CUSTOM_SCENES_V2');
             return;
           }
-          // 清洗快取中所有片段的殘留紅框，底部紅條一律消除
+          // 清洗快取中舊版殘留極窄紅條 (高度小於 5% 且貼在 90% 最底部的雜訊)
           parsed.forEach(scene => {
             if (scene.steps) {
               scene.steps.forEach(st => {
-                if (!st.tag || (st.box && (st.box[1] > 70 || st.box[3] < 10))) {
+                if (st.box && st.box[1] > 90 && st.box[3] < 5) {
                   st.hideBox = true;
-                  st.box = null;
-                  st.tag = '';
                 }
               });
             }
@@ -5600,6 +5781,7 @@
       window.addEventListener('DOMContentLoaded', () => {
     initStudioSplitter();
     initCursorDragEvents();
+    initFocusBoxDragAndResizeEvents();
     // 專業相片工作站：預設直接開啟編輯工作區 (Studio Mode)
     editMode = true;
     document.body.classList.add('is-editing');
