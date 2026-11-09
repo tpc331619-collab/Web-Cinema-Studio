@@ -1338,6 +1338,13 @@
     box-sizing: border-box !important;
   }
 
+  /* 收合左側控制抽屜 (優先權最高) */
+  body.drawer-collapsed #edit-drawer,
+  #edit-drawer.collapsed,
+  body.drawer-collapsed #studio-resizer {
+    display: none !important;
+  }
+
   body.is-editing .pop-drawer-header {
     background: #0f172a !important;
     border-bottom: 2px solid #1e293b !important;
@@ -2943,7 +2950,9 @@
       </div>
 
       <!-- (2) 右側主預覽畫面 (Studio Right Preview) -->
-      <div class="pop-cinema-stage" id="cinema-stage">
+      <div class="pop-cinema-stage" id="cinema-stage" style="position:relative;">
+        <!-- 展開側邊欄浮動按鈕 (當收合時浮動顯示於左上角) -->
+        <button class="pop-btn" id="btn-floating-drawer-expand" style="display:none; position:absolute; left:12px; top:12px; z-index:150; padding:5px 12px; font-size:0.76rem; font-weight:800; background:#18181b; color:#f4f4f5; border:1px solid #3f3f46; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.5); cursor:pointer;" onclick="toggleDrawerCollapse()" title="展開側邊編輯控制台">▶ 展開編輯</button>
       <main class="pop-main-area">
       <div class="pop-window-shell" id="window-shell">
         <div class="pop-mac-titlebar">
@@ -4519,20 +4528,37 @@
   let isDrawerCollapsed = false;
   function toggleDrawerCollapse() {
     const drawer = document.getElementById('edit-drawer');
-    const btn = document.getElementById('btn-drawer-collapse');
+    const resizer = document.getElementById('studio-resizer');
+    const floatBtn = document.getElementById('btn-floating-drawer-expand');
+    const editBtn = document.getElementById('btn-edit-mode');
     if (!drawer) return;
     isDrawerCollapsed = !isDrawerCollapsed;
+    document.body.classList.toggle('drawer-collapsed', isDrawerCollapsed);
+    drawer.classList.toggle('collapsed', isDrawerCollapsed);
     if (isDrawerCollapsed) {
-      drawer.style.display = 'none';
-      if (btn) btn.textContent = '▶ 展開';
+      drawer.style.setProperty('display', 'none', 'important');
+      if (resizer) resizer.style.setProperty('display', 'none', 'important');
+      if (floatBtn) floatBtn.style.setProperty('display', 'inline-flex', 'important');
+      if (editBtn) {
+        editBtn.classList.remove('active');
+        editBtn.innerHTML = '✏️ 展開面板';
+      }
     } else {
-      drawer.style.display = 'flex';
-      if (btn) btn.textContent = '◀ 收合';
+      drawer.style.removeProperty('display');
+      if (resizer) resizer.style.removeProperty('display');
+      if (floatBtn) floatBtn.style.setProperty('display', 'none', 'important');
+      if (editBtn) {
+        editBtn.classList.add('active');
+        editBtn.innerHTML = '✏️ 編輯';
+      }
     }
     updateScreenScale();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(isDrawerCollapsed ? '已收合左側面板 (全螢幕預覽模式)' : '已展開左側控制面板');
+    }
   }
 
-  // 頂部編輯鈕改造為快捷聚焦
+  // 頂部編輯鈕改造為快捷收合/展開
   function toggleEditMode() {
     toggleDrawerCollapse();
   }
@@ -5662,11 +5688,18 @@
     docClone.removeAttribute('style');
     const bodyClone = docClone.querySelector('body');
     if (bodyClone) {
-      bodyClone.classList.remove('is-editing', 'is-recording-clean');
+      bodyClone.classList.remove('is-editing', 'is-recording-clean', 'drawer-collapsed');
       if (!bodyClone.className.trim()) bodyClone.removeAttribute('class');
     }
     const ed = docClone.querySelector('#edit-drawer');
-    if (ed) ed.classList.remove('open');
+    if (ed) {
+      ed.classList.remove('open', 'collapsed');
+      ed.removeAttribute('style');
+    }
+    const resizerEl = docClone.querySelector('#studio-resizer');
+    if (resizerEl) resizerEl.removeAttribute('style');
+    const flb = docClone.querySelector('#btn-floating-drawer-expand');
+    if (flb) flb.style.display = 'none';
     const eb = docClone.querySelector('#btn-edit-mode');
     if (eb) eb.classList.remove('active');
     const pb = docClone.querySelector('#progress-bar');
