@@ -2741,12 +2741,26 @@
               <span style="font-size:0.75rem; font-weight:800; color:#ffffff; min-width:34px; text-align:center;" id="val-cam-zoom">1.00x</span>
               <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepZoom(0.2)">+</button>
               <div style="display:inline-flex; gap:3px; flex-shrink:0;">
-                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(0.2, 0, 0)">0.2x</button>
-                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(0.5, 0, 0)">0.5x</button>
-                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(1.0, 0, 0)">1.0x</button>
-                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(1.5, 0, 0)">1.5x</button>
-                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(2.0, 0, 0)">2.0x</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(0.2)">0.2x</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(0.5)">0.5x</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(1.0)">1.0x</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(1.5)">1.5x</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(2.0)">2.0x</button>
               </div>
+            </div>
+
+            <!-- 鏡頭位置平移移動控制 -->
+            <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; padding-top:2px;">
+              <span style="font-size:0.7rem; font-weight:800; color:#cbd5e1; white-space:nowrap;">移動:</span>
+              <div style="display:inline-flex; align-items:center; gap:2px;">
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepPan(-5, 0)" title="鏡頭往左平移 5%">⬅️</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepPan(5, 0)" title="鏡頭往右平移 5%">➡️</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepPan(0, -5)" title="鏡頭往上平移 5%">⬆️</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepPan(0, 5)" title="鏡頭往下平移 5%">⬇️</button>
+                <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem; background:#27272a; color:#cbd5e1;" onclick="stepPan(0, 0, true)" title="鏡頭平移座標歸零置中">🎯 居中</button>
+              </div>
+              <span style="font-size:0.68rem; font-family:monospace; color:#38bdf8; font-weight:800;" id="val-cam-pos">X:+0% Y:+0%</span>
+              <span style="font-size:0.62rem; color:#71717a;" title="在右側畫布空白處按住滑鼠左鍵或中鍵，即可直接抓取拖曳平移鏡頭">(可直接滑鼠拖曳畫布)</span>
             </div>
 
                         <!-- 電影級相片濾鏡預設 -->
@@ -3355,7 +3369,9 @@
     motionWorld.style.transition = `transform ${duration}s cubic-bezier(0.22, 1, 0.36, 1)`;
     motionWorld.style.transform = `scale(${z}) translate(${px}%, ${py}%)`;
 
-    document.getElementById('val-cam-zoom').textContent = (z || 1).toFixed(2) + 'x';
+    const valCamZoom = document.getElementById('val-cam-zoom');
+    if (valCamZoom) valCamZoom.textContent = (z || 1).toFixed(2) + 'x';
+    updateCamPosUI();
   }
 
   function parseBox(box) {
@@ -3598,6 +3614,80 @@
 
     window.addEventListener('pointerup', handlePointerUp);
     window.addEventListener('pointercancel', handlePointerUp);
+  }
+
+  // ================= 🖐️ 專業畫布抓手拖曳平移 (Direct Canvas Drag-to-Pan) =================
+  let isPanningCanvas = false;
+  let panStartX = 0, panStartY = 0;
+  let camStartPx = 0, camStartPy = 0;
+
+  function initCanvasPanEvents() {
+    const stage = document.getElementById('stage-viewport');
+    if (!stage) return;
+
+    stage.addEventListener('pointerdown', (e) => {
+      // 若點擊的是指示框、拉桿、游標或按鈕，不觸發畫布移動
+      if (e.target.closest('#focus-box') || e.target.closest('#mock-cursor') || e.target.closest('.pop-subtitle-line') || e.target.closest('button')) {
+        return;
+      }
+      if (e.button !== 0 && e.button !== 1) return;
+
+      const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
+      if (!step) return;
+      if (!step.cam) step.cam = [1.0, 0, 0];
+
+      isPanningCanvas = true;
+      panStartX = e.clientX;
+      panStartY = e.clientY;
+      camStartPx = step.cam[1] || 0;
+      camStartPy = step.cam[2] || 0;
+
+      stage.style.cursor = 'grabbing';
+      if (motionWorld) motionWorld.style.transition = 'none';
+
+      try { stage.setPointerCapture(e.pointerId); } catch(err) {}
+      e.preventDefault();
+    });
+
+    stage.addEventListener('pointermove', (e) => {
+      if (!isPanningCanvas) return;
+      const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
+      if (!step || !motionWorld) return;
+
+      const rect = stage.getBoundingClientRect();
+      const stageW = rect.width || 1000;
+      const stageH = rect.height || 600;
+
+      const dx = e.clientX - panStartX;
+      const dy = e.clientY - panStartY;
+
+      const z = step.cam[0] || 1.0;
+      // 將像素位移按當前縮放倍率折算為百分比
+      const pxDelta = (dx / stageW) * 100 / z;
+      const pyDelta = (dy / stageH) * 100 / z;
+
+      let newPx = Math.round(camStartPx + pxDelta);
+      let newPy = Math.round(camStartPy + pyDelta);
+      newPx = Math.max(-100, Math.min(100, newPx));
+      newPy = Math.max(-100, Math.min(100, newPy));
+
+      step.cam[1] = newPx;
+      step.cam[2] = newPy;
+
+      motionWorld.style.transform = `scale(${z}) translate(${newPx}%, ${newPy}%)`;
+      updateCamPosUI();
+    });
+
+    const stopPan = (e) => {
+      if (!isPanningCanvas) return;
+      isPanningCanvas = false;
+      stage.style.cursor = '';
+      try { stage.releasePointerCapture(e.pointerId); } catch(err) {}
+      autoSaveToStorage();
+    };
+
+    stage.addEventListener('pointerup', stopPan);
+    stage.addEventListener('pointercancel', stopPan);
   }
 
 
@@ -4165,26 +4255,54 @@
   }
 
 
-  // ================= 📹 鏡頭縮放 (支援縮小至 0.20x 縮小 5 倍 ~ 放大 5.00x) 與運鏡控制 =================
+  // ================= 📹 鏡頭縮放 (0.20x ~ 5.00x) 與平移移動控制 =================
   function stepZoom(delta) {
     const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
     if (!step) return;
     if (!step.cam) step.cam = [1.0, 0, 0];
     let newZ = parseFloat((step.cam[0] + delta).toFixed(2));
-    // 支援縮小到 0.2x (縮小 5 倍) ~ 放大 5.0x
     newZ = Math.max(0.2, Math.min(5.0, newZ));
     step.cam[0] = newZ;
-    applyCamTransform(0.25);
+    applyCamTransform(0.2);
     autoSaveToStorage();
   }
 
-  function setCamPreset(scale, px = 0, py = 0) {
+  function stepPan(deltaX, deltaY, isReset = false) {
+    const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
+    if (!step) return;
+    if (!step.cam) step.cam = [1.0, 0, 0];
+    if (isReset) {
+      step.cam[1] = 0;
+      step.cam[2] = 0;
+    } else {
+      let curX = parseFloat(((step.cam[1] || 0) + deltaX).toFixed(1));
+      let curY = parseFloat(((step.cam[2] || 0) + deltaY).toFixed(1));
+      curX = Math.max(-100, Math.min(100, curX));
+      curY = Math.max(-100, Math.min(100, curY));
+      step.cam[1] = curX;
+      step.cam[2] = curY;
+    }
+    applyCamTransform(0.2);
+    updateCamPosUI();
+    autoSaveToStorage();
+  }
+
+  function updateCamPosUI() {
+    const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
+    const valCamPos = document.getElementById('val-cam-pos');
+    if (!valCamPos) return;
+    const px = Math.round(step?.cam?.[1] || 0);
+    const py = Math.round(step?.cam?.[2] || 0);
+    valCamPos.textContent = `X:${px >= 0 ? '+' : ''}${px}% Y:${py >= 0 ? '+' : ''}${py}%`;
+  }
+
+  function setCamPreset(scale, px = null, py = null) {
     const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
     if (!step) return;
     if (!step.cam) step.cam = [1.0, 0, 0];
     step.cam[0] = scale;
-    step.cam[1] = px;
-    step.cam[2] = py;
+    if (px !== null) step.cam[1] = px;
+    if (py !== null) step.cam[2] = py;
     applyCamTransform(0.3);
     autoSaveToStorage();
   }
@@ -4885,6 +5003,7 @@
     updateCursorUIState();
     updateBoxUIState();
     updateCamABUIState();
+    updateCamPosUI();
 
     // 更新章節與時間軸指示
     updateMobileChaptersState();
@@ -6286,6 +6405,7 @@
     initStudioSplitter();
     initCursorDragEvents();
     initFocusBoxDragAndResizeEvents();
+    initCanvasPanEvents();
     // 專業相片工作站：預設直接開啟編輯工作區 (Studio Mode)
     editMode = true;
     document.body.classList.add('is-editing');
