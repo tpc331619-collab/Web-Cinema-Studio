@@ -1316,7 +1316,7 @@
   body.is-editing #edit-drawer {
     display: flex !important;
     flex-direction: column !important;
-    width: 420px; /* 預設 420px，可自由拖曳調整 */
+    width: 460px; /* 預設 460px 寬版舒適空間 */
     min-width: 260px !important;
     max-width: 75vw !important;
     height: 100% !important;
@@ -2399,6 +2399,103 @@
     border-radius: 4px !important;
   }
 
+
+  /* ================= 🔍 左側控制抽屜字級全面升級放大 (High Readability) ================= */
+  #edit-drawer, .pop-edit-drawer {
+    font-size: 0.85rem !important; /* 基礎字級提升至 13.6px */
+    color: #f4f4f5 !important;
+  }
+
+  /* 抽屜頂部頁籤按鈕 (Tabs) */
+  #edit-drawer .pop-tab-btn {
+    font-size: 0.86rem !important; /* 提升至約 14px */
+    font-weight: 700 !important;
+    padding: 6px 14px !important;
+    height: 32px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+  }
+
+  /* 抽屜內各功能卡片標題 (Section Titles) */
+  #edit-drawer span[style*="font-size:0.75rem"],
+  #edit-drawer .drawer-section-title {
+    font-size: 0.95rem !important; /* 提升至 15.2px */
+    font-weight: 800 !important;
+    color: #ffffff !important;
+    letter-spacing: 0.01em !important;
+  }
+
+  /* 抽屜內所有按鈕 (Buttons) */
+  #edit-drawer .pop-btn,
+  #edit-drawer button {
+    font-size: 0.82rem !important; /* 提升至 13.1px */
+    font-weight: 600 !important;
+    padding: 4px 10px !important;
+    min-height: 28px !important;
+    line-height: 1.2 !important;
+  }
+
+  /* 抽屜內所有文字標籤 (Labels) */
+  #edit-drawer span[style*="font-size:0.7rem"],
+  #edit-drawer span[style*="font-size:0.72rem"],
+  #edit-drawer span[style*="font-size:0.68rem"],
+  #edit-drawer label {
+    font-size: 0.82rem !important; /* 提升至 13.1px */
+    font-weight: 600 !important;
+    color: #e4e4e7 !important; /* 高對比明亮灰白，不再暗淡 */
+  }
+
+  /* 下拉選單 (Selects) */
+  #edit-drawer select {
+    font-size: 0.84rem !important; /* 提升至 13.5px */
+    font-weight: 600 !important;
+    height: 30px !important;
+    padding: 2px 8px !important;
+    background: #18181b !important;
+    color: #ffffff !important;
+    border: 1px solid #3f3f46 !important;
+    border-radius: 5px !important;
+  }
+
+  /* 輸入框 (Inputs) */
+  #edit-drawer input[type="text"],
+  #edit-drawer input[type="number"],
+  #edit-drawer .pop-edit-input {
+    font-size: 0.86rem !important; /* 提升至 13.8px */
+    height: 32px !important;
+    padding: 4px 10px !important;
+    background: #18181b !important;
+    color: #ffffff !important;
+    border: 1px solid #3f3f46 !important;
+    border-radius: 5px !important;
+  }
+
+  /* 旁白台詞多行文字框 (Textarea) */
+  #edit-drawer textarea,
+  #textarea-sub-edit {
+    font-size: 0.92rem !important; /* 提升至 14.8px */
+    line-height: 1.6 !important;
+    padding: 10px 12px !important;
+    background: #141417 !important;
+    color: #ffffff !important;
+    border: 1px solid #3f3f46 !important;
+    border-radius: 6px !important;
+  }
+
+  /* 抽屜內各功能卡片間距放大舒展 */
+  #edit-drawer div[style*="border-radius:8px"] {
+    padding: 10px 14px !important;
+    gap: 8px !important;
+  }
+
+  /* 運鏡速度與縮放顯示數據 */
+  #val-cam-zoom, #val-glide-speed {
+    font-size: 0.85rem !important;
+    font-weight: 700 !important;
+    color: #ffffff !important;
+    font-family: 'JetBrains Mono', monospace !important;
+  }
+
 </style>
 </head>
 <body>
@@ -2468,11 +2565,10 @@
         <div class="pop-tab-panel active" id="tab-panel-cam" style="display:flex; flex-direction:column; gap:8px;">
 
           <!-- 1️⃣ 指示框與標籤專區 -->
-          <div><!-- 1️⃣ 紅框與標籤專區 (紅色系) -->
-          <div style="background:#0f172a; border:1px solid #7f1d1d; border-left:4px solid #ef4444; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+          <div style="background:#18181b; border:1px solid #27272a; border-left:3px solid #71717a; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
-              <span style="font-size:0.75rem; font-weight:900; color:#fca5a5; display:flex; align-items:center; gap:5px;">
-                1 編輯紅框與標籤
+              <span style="font-size:0.75rem; font-weight:800; color:#f4f4f5; display:flex; align-items:center; gap:5px;">
+                1 指示框與標籤
               </span>
               <div style="display:flex; align-items:center; gap:5px;">
                 <button class="pop-btn" id="btn-toggle-spotlight" style="padding:2px 8px; font-size:0.68rem; font-weight:800; border:1px solid #475569; background:#1e293b; color:#cbd5e1; border-radius:5px; cursor:pointer;" onclick="toggleSpotlight()">聚光燈：關</button>
