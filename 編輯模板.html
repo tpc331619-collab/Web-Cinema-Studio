@@ -2776,9 +2776,10 @@
             <!-- 鏡頭運鏡軌跡 A➔B 與 運鏡時長 -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
               <span style="font-size:0.72rem; font-weight:800; color:#a1a1aa; white-space:nowrap;">手動自訂:</span>
-              <button class="pop-btn" id="btn-set-point-a" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointA()" title="記錄起點 A">A點</button>
+              <button class="pop-btn" id="btn-set-point-a" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointA()" title="記錄起點 A (再次點擊可取消)">A點</button>
               <button class="pop-btn" id="btn-set-point-b" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointB()" title="記錄終點 B">B點</button>
               <button class="pop-btn" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewABGlide()" title="預覽鏡頭推移">模擬AB</button>
+              <button class="pop-btn" id="btn-clear-cam-ab" style="background:#27272a; color:#f87171; border:1px solid #7f1d1d; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer; display:none;" onclick="clearCamAB()" title="清除鏡頭 A➔B 運鏡設定，恢復靜態">清除AB</button>
               <span id="cam-ab-status" style="display:none;"></span>
               <div style="display:inline-flex; align-items:center; gap:4px; margin-left:auto;">
                 <span style="font-size:0.68rem; color:#94a3b8;">運鏡時長:</span>
@@ -2815,9 +2816,10 @@
             <!-- 滑鼠軌跡 A➔B -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #042f2e; padding-top:4px;">
               <span style="font-size:0.72rem; font-weight:800; color:#22d3ee; white-space:nowrap;">滑鼠軌跡:</span>
-              <button class="pop-btn" id="btn-cursor-set-a" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointA()" title="拖曳至起點後記錄">A點</button>
-              <button class="pop-btn" id="btn-cursor-set-b" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointB()" title="拖曳至目標點後記錄">B點</button>
+              <button class="pop-btn" id="btn-cursor-set-a" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointA()" title="拖曳至起點後記錄 (再次點擊可取消)">A點</button>
+              <button class="pop-btn" id="btn-cursor-set-b" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointB()" title="拖曳至目標點後記錄 (再次點擊可取消)">B點</button>
               <button class="pop-btn" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewCursorABGlide()" title="預覽滑行與點擊">模擬AB</button>
+              <button class="pop-btn" id="btn-clear-cursor-ab" style="background:#27272a; color:#f87171; border:1px solid #7f1d1d; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer; display:none;" onclick="clearCursorAB()" title="清除滑鼠 A➔B 軌跡，還原為單點游標">清除AB</button>
               <span id="cursor-ab-status" style="display:none;"></span>
               <div style="display:inline-flex; align-items:center; gap:4px; margin-left:auto;">
                 <span style="font-size:0.68rem; color:#94a3b8;">移動時長:</span>
@@ -3715,6 +3717,11 @@
       }
     }
 
+    const clearCursorBtn = document.getElementById('btn-clear-cursor-ab');
+    if (clearCursorBtn) {
+      clearCursorBtn.style.display = (pointA || pointB) ? 'inline-flex' : 'none';
+    }
+
     if (statusSpan) {
       if (pointA && pointB) {
         statusSpan.innerHTML = `A(${pointA[0].toFixed(0)}%, ${pointA[1].toFixed(0)}%) → B(${pointB[0].toFixed(0)}%, ${pointB[1].toFixed(0)}%)`;
@@ -3729,53 +3736,126 @@
     }
   }
 
+  function updateCamABUIState() {
+    const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
+    const btnA = document.getElementById('btn-set-point-a');
+    const btnB = document.getElementById('btn-set-point-b');
+    const statusEl = document.getElementById('cam-ab-status');
+    const clearBtn = document.getElementById('btn-clear-cam-ab');
 
-    function setPointA() {
+    if (!step) return;
+
+    if (btnA) {
+      if (step.fromCam) {
+        const z = step.fromCam[0].toFixed(1);
+        btnA.style.background = '#14532d';
+        btnA.style.borderColor = '#22c55e';
+        btnA.style.color = '#86efac';
+        btnA.innerHTML = `A點已就緒 (${z}x)`;
+        btnA.title = '起點 A 已設定 (點擊可取消)';
+      } else {
+        btnA.style.background = '#27272a';
+        btnA.style.borderColor = '#3f3f46';
+        btnA.style.color = '#f4f4f5';
+        btnA.innerHTML = 'A點';
+        btnA.title = '記錄起點 A';
+      }
+    }
+
+    if (btnB) {
+      if (step.cam && step.fromCam) {
+        const z = step.cam[0].toFixed(1);
+        btnB.style.background = '#1e3a5f';
+        btnB.style.borderColor = '#38bdf8';
+        btnB.style.color = '#bae6fd';
+        btnB.innerHTML = `B點已就緒 (${z}x)`;
+        btnB.title = '終點 B 已設定 (點擊可重設)';
+      } else {
+        btnB.style.background = '#27272a';
+        btnB.style.borderColor = '#3f3f46';
+        btnB.style.color = '#f4f4f5';
+        btnB.innerHTML = 'B點';
+        btnB.title = '記錄終點 B';
+      }
+    }
+
+    if (clearBtn) {
+      clearBtn.style.display = (step.fromCam) ? 'inline-flex' : 'none';
+    }
+
+    if (statusEl) {
+      if (step.fromCam && step.cam) {
+        statusEl.innerHTML = '<span style="color:#10b981; font-weight:800;">A(' + step.fromCam[0].toFixed(1) + 'x)➔B(' + step.cam[0].toFixed(1) + 'x)</span>';
+        statusEl.style.display = 'inline-block';
+      } else {
+        statusEl.style.display = 'none';
+      }
+    }
+  }
+
+  function setPointA() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!step) return;
+    if (step.fromCam) {
+      // 若已設定，再次點擊取消 A 點
+      delete step.fromCam;
+      delete step.fromBox;
+      delete step.kenBurnsPreset;
+      updateCamABUIState();
+      renderTimelineRail();
+      autoSaveToStorage();
+      if (typeof showScriptToast === 'function') {
+        showScriptToast('已取消鏡頭 A 點');
+      }
+      return;
+    }
     if (!step.cam) step.cam = [1.0, 0, 0];
     step.fromCam = JSON.parse(JSON.stringify(step.cam));
     step.fromBox = JSON.parse(JSON.stringify(step.box));
-
-    const z = step.fromCam[0].toFixed(2);
-    const btnA = document.getElementById('btn-set-point-a');
-    if (btnA) {
-      btnA.style.background = '#dcfce7';
-      btnA.style.borderColor = '#16a34a';
-      btnA.style.color = '#15803d';
-      btnA.innerHTML = `A點已就緒 (${z}x)`;
-    }
-    const statusEl = document.getElementById('cam-ab-status');
-    if (statusEl) {
-      statusEl.innerHTML = '<span style="color:#10b981; font-weight:800;">A(' + z + 'x)➔B(' + (step.cam ? step.cam[0] : 1).toFixed(1) + 'x)</span>';
-      statusEl.style.display = 'inline-block';
-    }
+    updateCamABUIState();
+    renderTimelineRail();
     autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(`已記錄鏡頭起點 A (${step.fromCam[0].toFixed(1)}x)`);
+    }
   }
 
   function setPointB() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!step) return;
     if (!step.cam) step.cam = [1.0, 0, 0];
-    const z = step.cam[0].toFixed(2);
-    const btnB = document.getElementById('btn-set-point-b');
-    if (btnB) {
-      btnB.style.background = '#dcfce7';
-      btnB.style.borderColor = '#16a34a';
-      btnB.style.color = '#15803d';
-      btnB.innerHTML = `B點已就緒 (${z}x)`;
-    }
-    const statusEl = document.getElementById('cam-ab-status');
-    if (statusEl && step.fromCam) {
-      statusEl.innerHTML = '<span style="color:#10b981; font-weight:800;">A(' + step.fromCam[0].toFixed(1) + 'x)➔B(' + z + 'x)</span>';
-      statusEl.style.display = 'inline-block';
-    }
+    updateCamABUIState();
+    renderTimelineRail();
     autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(`已記錄鏡頭終點 B (${step.cam[0].toFixed(1)}x)`);
+    }
+  }
+
+  function clearCamAB() {
+    const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
+    if (!step) return;
+    delete step.fromCam;
+    delete step.fromBox;
+    delete step.kenBurnsPreset;
+    updateCamABUIState();
+    const sel = document.getElementById('select-kenburns-preset');
+    if (sel) sel.value = '';
+    renderTimelineRail();
+    autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('已清除鏡頭 A➔B 運鏡軌跡');
+    }
   }
 
   function previewABGlide() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
-    if (!step || !step.fromCam) return;
+    if (!step || !step.fromCam) {
+      if (typeof showScriptToast === 'function') {
+        showScriptToast('請先記錄鏡頭 [A點] 起點或選擇動畫預設！');
+      }
+      return;
+    }
     const duration = parseFloat(step.motionDuration || 1.0);
 
     // 1. 瞬間切換至 A 點
@@ -3798,6 +3878,17 @@
   function setCursorPointA() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!step || !mockCursor) return;
+    if (step.fromCursorPos || step.cursorA) {
+      // 再次點擊取消 A 點
+      delete step.fromCursorPos;
+      delete step.cursorA;
+      updateCursorUIState(false);
+      autoSaveToStorage();
+      if (typeof showScriptToast === 'function') {
+        showScriptToast('已取消滑鼠 A 點');
+      }
+      return;
+    }
     const curLeft = parseFloat(mockCursor.style.left) || 50;
     const curTop = parseFloat(mockCursor.style.top) || 50;
     step.fromCursorPos = [curLeft, curTop];
@@ -3806,11 +3897,25 @@
     mockCursor.classList.add('visible');
     updateCursorUIState(false);
     autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('已設定滑鼠起點 A (再次點擊可取消)');
+    }
   }
 
   function setCursorPointB() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!step || !mockCursor) return;
+    if (step.cursorPos || step.cursorB) {
+      // 再次點擊取消 B 點
+      delete step.cursorPos;
+      delete step.cursorB;
+      updateCursorUIState(false);
+      autoSaveToStorage();
+      if (typeof showScriptToast === 'function') {
+        showScriptToast('已取消滑鼠 B 點');
+      }
+      return;
+    }
     const curLeft = parseFloat(mockCursor.style.left) || 50;
     const curTop = parseFloat(mockCursor.style.top) || 50;
     step.cursorPos = [curLeft, curTop];
@@ -3819,17 +3924,45 @@
     mockCursor.classList.add('visible');
     updateCursorUIState(false);
     autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('已設定滑鼠目標點 B (再次點擊可取消)');
+    }
+  }
+
+  function clearCursorAB() {
+    const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
+    if (!step) return;
+    delete step.fromCursorPos;
+    delete step.cursorA;
+    delete step.cursorPos;
+    delete step.cursorB;
+    if (mockCursor) {
+      mockCursor.style.transition = 'none';
+      mockCursor.style.left = '50%';
+      mockCursor.style.top = '50%';
+    }
+    updateCursorUIState(false);
+    autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('已清除滑鼠 A➔B 軌跡 (恢復置中靜態游標)');
+    }
   }
 
   function previewCursorABGlide() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!step || !mockCursor) return;
-    const pointA = step.fromCursorPos || step.cursorA || [15, 20];
-    const pointB = step.cursorPos || step.cursorB || [50, 50];
-    const startX = pointA[0];
-    const startY = pointA[1];
-    const targetX = pointB[0];
-    const targetY = pointB[1];
+    const pointA = step.fromCursorPos || step.cursorA;
+    const pointB = step.cursorPos || step.cursorB;
+    if (!pointA && !pointB) {
+      if (typeof showScriptToast === 'function') {
+        showScriptToast('請先記錄滑鼠 [A點] 或 [B點]！');
+      }
+      return;
+    }
+    const startX = (pointA && Array.isArray(pointA)) ? pointA[0] : 50;
+    const startY = (pointA && Array.isArray(pointA)) ? pointA[1] : 50;
+    const targetX = (pointB && Array.isArray(pointB)) ? pointB[0] : startX;
+    const targetY = (pointB && Array.isArray(pointB)) ? pointB[1] : startY;
     const dur = parseFloat(step.glideDuration || step.cursorDuration || step.motionDuration || 0.8);
 
     mockCursor.classList.remove('is-hidden');
@@ -4680,9 +4813,10 @@
     const sliderGlideSpeed = document.getElementById('slider-glide-speed');
     if (sliderGlideSpeed) sliderGlideSpeed.value = step.motionDuration || 1.0;
 
-    // 游標與紅框 UI 狀態同步
+    // 游標、鏡頭 AB 與紅框 UI 狀態同步
     updateCursorUIState();
     updateBoxUIState();
+    updateCamABUIState();
 
     // 更新章節與時間軸指示
     updateMobileChaptersState();
