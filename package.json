@@ -1,0 +1,12 @@
+{
+  "name": "web-cinema-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "零依賴、純前端、免安裝的瀏覽器端導覽影片動畫工作站",
+  "scripts": {
+    "dev": "live-server --port=3000 --open=index.html --wait=200 --ignore=node_modules,.git"
+  },
+  "devDependencies": {
+    "live-server": "^1.2.2"
+  }
+}

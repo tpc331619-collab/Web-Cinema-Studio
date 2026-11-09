@@ -1,20 +1,24 @@
-# 🎬 Web Cinema Studio (瀏覽器端導覽影片動畫工作站)
+# 🎬 Web Cinema Studio (專業照片動態動畫編輯器)
 
 [![GitHub Pages](https://img.shields.io/badge/GitHub%20Pages-Live%20Demo-brightgreen)](https://tpc331619-collab.github.io/Web-Cinema-Studio/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Pure Vanilla JS](https://img.shields.io/badge/Stack-Pure%20HTML5%20%2F%20Canvas%20%2F%20CSS-orange)](#)
 
-> **零依賴、純前端、免安裝** 的高顏值產品教學／操作導覽影片與簡報製作平台。  
-> 只要瀏覽器打開即可使用，支援 2D 運鏡平移縮放、模擬滑鼠軌跡點擊、機械音打字機字幕、剪映多軌時間軸、CSV 批次產生影片與高畫質影片錄製匯出。
+> **零依賴、純前端、免安裝** 的專業照片動態動畫（Photo-to-Animation）製作平台。  
+> 只要瀏覽器打開即可使用，支援經典 Ken Burns 相片運鏡、16:9 / 9:16 / 1:1 畫幅比例切換、背景毛玻璃防黑邊、多軌時間軸、打字機旁白字幕與高畫質影片錄製匯出。
 
 ---
 
 ## 🌟 核心特色 (Key Features)
 
-- 🎥 **2D 鏡頭縮放與平滑運鏡 (Camera Motion Engine)**
-  - 支援 **0.20x（縮小 5 倍）~ 5.00x（超高倍放大）** 無損縮放。
-  - A 點起點 ➔ B 點終點平滑長距運鏡滑行，支援自訂運鏡時長與即時預覽。
-  - 滾輪縮放自適應與一鍵鏡頭歸位。
+- 🎥 **經典 Ken Burns 相片運鏡與 2D 平滑運鏡 (Ken Burns Motion Engine)**
+  - 支援 **8 種一鍵相片經典動畫預設**（慢速推近 Zoom In、特寫拉遠 Zoom Out、全景平移 Pan Left/Right、俯仰 Tilt Up/Down、傾角推鏡 Diagonal、靜止 Static）。
+  - 支援 **0.20x ~ 5.00x** 無損縮放，自由微調 A 點起點 ➔ B 點終點。
+  - 時間軸卡片上一鍵點擊輪換運鏡效果，並支援「全部套用」批次排版。
+
+- 📐 **多畫幅比例與照片背景毛玻璃填充 (Aspect Ratio & Blur Backdrop)**
+  - 支援 **16:9**（橫式寬螢幕）、**9:16**（直式短影音 Reels/TikTok/Shorts）、**1:1**（正方形貼文）一鍵切換。
+  - **自動高斯模糊背景填充（Blur Backdrop）**：非同比例照片自動生成氛圍毛玻璃背景，徹底消除黑邊！
 
 - 🖱️ **擬真模擬滑鼠軌跡與點擊動畫 (Mock Cursor)**
   - 支援高顏值極致白／黑指針與大白手套。
@@ -111,3 +115,4 @@ images/04.jpg,巡檢完成後系統自動記錄報告並產生合格證書。,2.
 ## 📄 License
 
 MIT License. 歡迎自由修改、客製或作為商業簡報與產品導覽工具使用！
+

@@ -12,6 +12,10 @@ desktop.ini
 !images/**/*.png
 !images/**/*.jpeg
 
+# Node
+node_modules/
+
 # VSCode / IDE
 .vscode/
 .idea/
+

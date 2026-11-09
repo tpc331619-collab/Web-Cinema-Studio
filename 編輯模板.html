@@ -2,7 +2,7 @@
 <html lang="zh-TW"><head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>FSIPPRO 智慧消防安全查檢系統 · 實機操作演練 (PAPAYA 卡通活潑版)</title>
+  <title>Web Cinema Studio · 專業照片動態動畫編輯器</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700;800&amp;family=Noto+Sans+TC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
@@ -1883,7 +1883,15 @@
   }
 
 
-    /* ================= 🎬 實機畫面與懸浮螢幕下方字幕 ================= */
+    
+  /* ================= 🎨 電影級相片濾鏡 (Cinematic Color Grading) ================= */
+  .pop-screen-item.filter-vintage img { filter: sepia(0.32) contrast(1.12) brightness(0.96) saturate(1.2) !important; }
+  .pop-screen-item.filter-teal-orange img { filter: contrast(1.22) saturate(1.25) hue-rotate(-12deg) !important; }
+  .pop-screen-item.filter-monochrome img { filter: grayscale(1) contrast(1.32) brightness(0.94) !important; }
+  .pop-screen-item.filter-golden img { filter: sepia(0.22) saturate(1.35) brightness(1.04) contrast(1.08) !important; }
+  .pop-screen-item.filter-cold img { filter: saturate(0.85) contrast(1.15) hue-rotate(15deg) brightness(0.98) !important; }
+
+  /* ================= 🎬 實機畫面與懸浮螢幕下方字幕 ================= */
   .pop-stage-viewport {
     position: relative !important;
     overflow: hidden !important;
@@ -2008,10 +2016,16 @@
       <div class="pop-header-line1" style="display:flex; align-items:center; gap:12px;">
         <a href="#" class="pop-brand" style="display:flex; align-items:center; gap:8px; text-decoration:none;">
           <div class="pop-brand-badge" style="width:30px; height:30px; border-radius:8px; background:linear-gradient(135deg, #4f46e5, #06b6d4); display:flex; align-items:center; justify-content:center; box-shadow:0 0 10px rgba(99,102,241,0.4); border:none; font-size:1rem;">🎬</div>
-          <div class="pop-brand-text" style="display:none;"></div>
+          <div class="pop-brand-text" style="font-size:0.95rem; font-weight:800; color:#0f172a; white-space:nowrap;">Cinema Studio <span style="color:#0284c7; font-size:0.8rem; font-weight:700;">· 照片動態動畫</span></div>
         </a>
 
         <div class="pop-header-actions" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          <!-- 畫幅比例切換器 (Aspect Ratio) -->
+          <div class="pop-aspect-selector" style="display:inline-flex; align-items:center; background:#1e293b; border-radius:6px; padding:2px; border:1.5px solid #334155; gap:2px;">
+            <button type="button" class="aspect-btn" id="btn-aspect-16-9" onclick="setAspectRatio('16:9')" title="16:9 橫向 (YouTube / 簡報)" style="border:none; background:#0284c7; color:#fff; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">16:9</button>
+            <button type="button" class="aspect-btn" id="btn-aspect-9-16" onclick="setAspectRatio('9:16')" title="9:16 直向 (Shorts / Reels / TikTok)" style="border:none; background:transparent; color:#94a3b8; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">9:16</button>
+            <button type="button" class="aspect-btn" id="btn-aspect-1-1" onclick="setAspectRatio('1:1')" title="1:1 正方形 (IG 貼文)" style="border:none; background:transparent; color:#94a3b8; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">1:1</button>
+          </div>
           <button class="pop-btn voice-on" id="btn-voice-toggle" onclick="toggleVoice()">
             <span class="btn-text-full">🔊 打字音：開</span>
             <span class="btn-text-short">🔊</span>
@@ -2157,9 +2171,40 @@
               </div>
             </div>
 
+                        <!-- 電影級相片濾鏡預設 -->
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
+              <span style="font-size:0.72rem; font-weight:800; color:#38bdf8; white-space:nowrap;">🎨 色彩風格:</span>
+              <select id="select-filter-preset" onchange="applyFilterPreset(this.value)" style="background:#0c4a6e; color:#e0f2fe; border:1px solid #0284c7; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
+                <option value="none">🌈 自然原色 (Natural)</option>
+                <option value="vintage">🎞️ 復古底片 (Warm Vintage)</option>
+                <option value="teal-orange">🎬 電影青橙 (Teal & Orange)</option>
+                <option value="golden">🌅 晨曦暖調 (Golden Hour)</option>
+                <option value="cold">❄️ 冷冽電影 (Cold Cinema)</option>
+                <option value="monochrome">🖤 經典黑白 (Classic B&W)</option>
+              </select>
+              <button class="pop-btn" type="button" style="background:#0369a1; color:#e0f2fe; border:1px solid #0284c7; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyFilterToAll()" title="將此色彩風格套用至所有照片片段">全部套用</button>
+            </div>
+
+            <!-- Ken Burns 照片運鏡預設選單 -->
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
+              <span style="font-size:0.72rem; font-weight:800; color:#f472b6; white-space:nowrap;">🎬 動畫預設:</span>
+              <select id="select-kenburns-preset" onchange="applyKenBurnsPreset(this.value)" style="background:#1e1b4b; color:#e0e7ff; border:1px solid #6366f1; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
+                <option value="">⚡ 選擇經典照片運鏡...</option>
+                <option value="zoom-in">🔍 慢速推近 (Zoom In)</option>
+                <option value="zoom-out">🔎 特寫拉遠 (Zoom Out)</option>
+                <option value="pan-left">⬅️ 全景向左平移 (Pan Left)</option>
+                <option value="pan-right">➡️ 全景向右平移 (Pan Right)</option>
+                <option value="tilt-up">⬆️ 由下往上推 (Tilt Up)</option>
+                <option value="tilt-down">⬇️ 由上往下移 (Tilt Down)</option>
+                <option value="diagonal">↗️ 傾角推鏡 (Diagonal Zoom)</option>
+                <option value="static">⏹️ 靜止畫面 (Static)</option>
+              </select>
+              <button class="pop-btn" type="button" style="background:#4338ca; color:#e0e7ff; border:1px solid #6366f1; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyKenBurnsToAll()" title="將此動畫預設套用至所有照片片段">全部套用</button>
+            </div>
+
             <!-- 鏡頭運鏡軌跡 A➔B 與 運鏡時長 -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
-              <span style="font-size:0.72rem; font-weight:800; color:#c084fc; white-space:nowrap;">鏡頭運鏡:</span>
+              <span style="font-size:0.72rem; font-weight:800; color:#c084fc; white-space:nowrap;">手動自訂:</span>
               <button class="pop-btn" id="btn-set-point-a" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointA()" title="記錄起點 A">A點</button>
               <button class="pop-btn" id="btn-set-point-b" style="background:#f0fdf4; color:#16a34a; border:1px solid #86efac; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointB()" title="記錄終點 B">B點</button>
               <button class="pop-btn" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewABGlide()" title="預覽鏡頭推移">模擬AB</button>
@@ -2339,334 +2384,14 @@
         <div class="pop-stage-viewport" id="stage-viewport">
           <div class="pop-motion-world" id="motion-world" style="transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); transform: scale(1) translate(0%, 0%);">
             <div class="pop-screen-layer" id="screen-layer">
-              <!-- SCREEN 1: AUTH -->
-            <section class="app-screen auth-screen-bg" id="screen-auth" style="display: none; z-index: 1;">
-              <div class="auth-card" id="authCard">
-                <div class="auth-shield-box">🛡️</div>
-                <div class="auth-title">FIRECHECK<span>PRO</span></div>
-                <div class="auth-subtitle">⚡ AI 智能消防安全檢查系統</div>
-
-                <div class="auth-google-btn" id="btnGoogleLogin">
-                  <span style="background:#fff;color:#ea4335;width:20px;height:20px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;">G</span>
-                  <span id="googleBtnText">使用 Google 登入</span>
-                </div>
-
-                <div class="auth-divider">SYSTEM ACCESS</div>
-
-                <div class="auth-guest-btn" id="btnGuestLogin">
-                  <span>👤</span>
-                  <span id="guestBtnText">訪客</span>
-                </div>
-
-                <div style="margin-top:18px;font-size:10px;color:#10b981;letter-spacing:1.5px;font-weight:800;">● SYSTEM OPERATIONAL</div>
-              </div>
-
-              <div class="live-modal-backdrop" id="modal-whitelist">
-                <div class="dark-modal-card">
-                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-                    <div style="font-size:16px;font-weight:900;color:#fde047;">🛡️ 後台用戶管理 — 零信任白名單審核與指派</div>
-                    <span class="pill-badge pill-amber" id="wlStatusPill">⏳ 待審核申請 (1)</span>
-                  </div>
-                  <table class="ws-table">
-                    <thead><tr><th>申請人 Google 帳號</th><th>指派角色</th><th>所屬組織</th><th>操作</th></tr></thead>
-                    <tbody>
-                      <tr>
-                        <td>chen.inspector@gmail.com</td>
-                        <td><span class="pill-badge pill-blue">檢查員 (Inspector)</span></td>
-                        <td>北部儲運中心</td>
-                        <td><button id="btnApproveUser" style="background:#10b981;color:#0f172a;border:none;padding:5px 12px;border-radius:6px;font-weight:900;cursor:pointer;">✓ 一鍵核准開通</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </section>
-
-            <!-- SCREEN 2: DASHBOARD -->
-            <section class="app-screen" id="screen-dashboard" style="display: none; z-index: 1;">
-              <div class="sys-topbar">
-                <div class="official-logo-wrap">
-                  <span class="brand-main" style="font-size:16px;">FSIPPRO</span>
-                </div>
-                <div class="sys-top-actions">
-                  <div class="sys-org-pill" id="topOrgBtn">北部儲運中心 🏢</div>
-                  <div class="sys-icon-btn" id="topGuestQrBtn">🏁</div>
-                  <div class="sys-icon-btn" id="topSettingsBtn">⚙️</div>
-                  <div class="sys-icon-btn" id="topBellBtn">🔔<span class="sys-badge-dot">2</span></div>
-                </div>
-              </div>
-
-              <div class="dash-body">
-                <div class="dash-greet-row">
-                  <div class="greet-left" id="greetAvatarArea">
-                    <div>
-                      <div class="greet-title">早安，Admin</div>
-                      <div class="greet-date">2026/11/08</div>
-                    </div>
-                    <div class="greet-avatar" id="avatarBtn">A</div>
-                  </div>
-                  <div class="search-bar-mock" id="quickSearchBar">
-                    <span>🔍 快速查詢 (掃描條碼)...</span>
-                    <span style="color:#0f172a;font-weight:900;">⛶</span>
-                  </div>
-                </div>
-
-                <div class="hud-grid-6" id="hudGrid6">
-                  <div class="hud-card hud-c1" id="hud1">
-                    <div class="hud-top">設備總數 <span class="hud-tag" style="background:#e0f2fe;color:#0284c7;">列管</span></div>
-                    <div class="hud-val-row"><div><span class="hud-big-num">107</span> <span style="font-size:11px;font-weight:800;">具</span></div><div class="hud-icon-circle" style="background:#eff6ff;color:#3b82f6;">🛢️</div></div>
-                    <div class="hud-sub">全區列管消防設備</div>
-                  </div>
-                  <div class="hud-card hud-c2" id="hud2">
-                    <div class="hud-top">待處理異常 <span class="hud-tag" style="background:#fee2e2;color:#dc2626;">待複檢</span></div>
-                    <div class="hud-val-row"><div><span class="hud-big-num" style="color:#dc2626;">1</span> <span style="font-size:11px;font-weight:800;">件</span></div><div class="hud-icon-circle" style="background:#fef2f2;color:#ef4444;">❗</div></div>
-                    <div class="hud-sub" style="color:#dc2626;">尚有待改善異常項目</div>
-                  </div>
-                  <div class="hud-card hud-c3" id="hud3">
-                    <div class="hud-top">申報倒數 <span class="hud-tag" style="background:#fef3c7;color:#d97706;">每年</span></div>
-                    <div class="hud-val-row"><div><span class="hud-big-num">358</span> <span style="font-size:11px;font-weight:800;">天</span></div><div class="hud-icon-circle" style="background:#fffbeb;color:#f59e0b;">📅</div></div>
-                    <div class="hud-sub">上次申報: 2026/10/30</div>
-                  </div>
-                  <div class="hud-card hud-c4" id="hud4">
-                    <div class="hud-top">燈號規則設定 <span class="hud-tag" style="background:#ffedd5;color:#ea580c;">規則</span></div>
-                    <div class="hud-val-row"><div style="font-size:14px;font-weight:900;">燈號設定 🔴🟡🟢</div><div class="hud-icon-circle" style="background:#fff7ed;color:#ea580c;">🚦</div></div>
-                    <div class="hud-sub">紅、黃、綠燈預警週期</div>
-                  </div>
-                  <div class="hud-card hud-c5" id="hud5">
-                    <div class="hud-top">功能設定 <span class="hud-tag" style="background:#e0e7ff;color:#4f46e5;">權限</span></div>
-                    <div class="hud-val-row"><div style="font-size:15px;font-weight:900;">ON/OFF 🟢</div><div class="hud-icon-circle" style="background:#eef2ff;color:#6366f1;">🛡️</div></div>
-                    <div class="hud-sub">檢查員權限與訪客模式</div>
-                  </div>
-                  <div class="hud-card hud-c6" id="hud6">
-                    <div class="hud-top">帳號管理 <span class="hud-tag" style="background:#fce7f3;color:#db2777;">後台</span></div>
-                    <div class="hud-val-row"><div style="font-size:14px;font-weight:900;">審核與指派</div><div class="hud-icon-circle" style="background:#fdf2f8;color:#ec4899;">⚙️</div></div>
-                    <div class="hud-sub">白名單審核與組織管理</div>
-                  </div>
-                </div>
-
-                <div class="mod-grid-9" id="modGrid9">
-                  <div class="mod-card" id="modCardInspect">
-                    <div class="mod-badge-tr" id="dashRateBadge">達成率 79%</div>
-                    <div class="mod-icon" style="background:#2563eb;">📋</div>
-                    <div><div class="mod-title">開始檢查</div><div class="mod-desc" style="color:#dc2626;" id="dashRemainText">尚有 23 具設備需檢查</div><div class="mod-prog-bar"><div class="mod-prog-fill" id="dashProgFill"></div></div></div>
-                  </div>
-                  <div class="mod-card" id="modCardRecheck"><div class="mod-icon" style="background:#f59e0b;">⚠️</div><div><div class="mod-title">異常複檢</div><div class="mod-desc">1 筆待處理</div></div></div>
-                  <div class="mod-card" id="modCardHistory"><div class="mod-icon" style="background:#4f46e5;">📜</div><div><div class="mod-title">歷史資料</div><div class="mod-desc">521 筆檢查紀錄</div></div></div>
-                  <div class="mod-card" id="modCardMyEquip"><div class="mod-icon" style="background:#0891b2;">🏢</div><div><div class="mod-title">我的設備</div><div class="mod-desc">查看所有設備清單</div></div></div>
-                  <div class="mod-card" id="modCardMyMap"><div class="mod-icon" style="background:#9333ea;">🗺️</div><div><div class="mod-title">我的地圖</div><div class="mod-desc">編輯圖面與點位</div></div></div>
-                  <div class="mod-card" id="modCardAddEquip"><div class="mod-icon" style="background:#10b981;">➕</div><div><div class="mod-title">新增設備</div><div class="mod-desc">新增設備至系統</div></div></div>
-                  <div class="mod-card" id="modCardExpiry"><div class="mod-icon" style="background:#db2777;">🕒</div><div><div class="mod-title">效期追蹤</div><div class="mod-desc">4 項效期監控中</div></div></div>
-                  <div class="mod-card" id="modCardCategory"><div class="mod-icon" style="background:#ea580c;">📑</div><div><div class="mod-title">設備分類</div><div class="mod-desc">新增設備分類項目</div></div></div>
-                  <div class="mod-card" id="modCardOverview"><div class="mod-icon" style="background:#475569;">📊</div><div><div class="mod-title">設備概覽</div><div class="mod-desc">查看設備統計與分布</div></div></div>
-                </div>
-
-                <div class="dash-footer">V 2.6.3 · 更新日期26/11/07 · © 2026 FSIPPRO Team. All Rights Reserved.</div>
-                <div class="fab-scan-btn" id="fabScanBtn">⌖</div>
-              </div>
-
-              <div class="live-modal-backdrop" id="modal-card-order">
-                <div class="live-modal-card" style="width:360px;">
-                  <div style="font-size:15px;font-weight:900;margin-bottom:8px;display:flex;justify-content:space-between;">
-                    <span>⇅ 首頁卡片順序設定</span><span style="font-size:11px;color:#2563eb;">拖曳自由排序</span>
-                  </div>
-                  <div style="display:flex;flex-direction:column;gap:6px;font-size:12.5px;font-weight:800;">
-                    <div style="padding:8px 10px;background:#eff6ff;border:1px solid #3b82f6;border-radius:6px;display:flex;justify-content:space-between;"><span>1. 📋 開始檢查</span><span>☰</span></div>
-                    <div style="padding:8px 10px;background:#fef3c7;border:1px solid #f59e0b;border-radius:6px;display:flex;justify-content:space-between;"><span>2. ⚠️ 異常複檢</span><span>☰</span></div>
-                    <div style="padding:8px 10px;background:#f8fafc;border:1px solid #cbd5e1;border-radius:6px;display:flex;justify-content:space-between;"><span>3. 🏢 我的設備</span><span>☰</span></div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="live-modal-backdrop" id="modal-passport">
-                <div class="dark-modal-card" style="width:520px;">
-                  <div style="display:flex;gap:14px;align-items:center;border-bottom:1px solid rgba(255,255,255,0.12);padding-bottom:12px;">
-                    <div style="width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#ef4444,#991b1b);display:flex;align-items:center;justify-content:center;font-size:30px;">🧯</div>
-                    <div style="flex:1;">
-                      <div style="display:flex;align-items:center;gap:6px;"><span style="font-size:17px;font-weight:900;">10型乾粉滅火器 (FE-A1-001)</span><span class="pill-badge pill-green">● 正常合格</span></div>
-                      <div style="font-size:11.5px;color:#94a3b8;margin-top:3px;">場所：北部儲運中心 · B棟 1F 東側走道 ｜ 週期：30天</div>
-                    </div>
-                  </div>
-                  <div style="margin-top:10px;font-size:12px;font-weight:800;color:#fde047;margin-bottom:6px;">🕒 近 5 次巡檢與維修時間軸</div>
-                  <div style="display:flex;flex-direction:column;gap:6px;font-size:12px;">
-                    <div style="background:rgba(16,185,129,0.12);border-left:3px solid #10b981;padding:6px 10px;border-radius:5px;"><b>2026/11/07 09:15</b> · 例行定檢合格（壓力錶：5.8 kgf/cm²）</div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="live-modal-backdrop" id="modal-guest-qr">
-                <div class="dark-modal-card" style="width:480px;text-align:center;">
-                  <div style="font-size:17px;font-weight:900;color:#fde047;">🪧 消防稽查訪客通行碼立牌（0.5 秒免按直入）</div>
-                  <div style="font-size:12px;color:#cbd5e1;margin:4px 0 12px;">張貼於受信總機旁 · 官員掃碼即啟動 30:00 唯讀沙盒倒數</div>
-                  <div style="width:130px;height:130px;margin:0 auto;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;color:#0f172a;font-weight:900;border:3px solid #f59e0b;"><span style="font-size:24px;">▣ QR</span></div>
-                </div>
-              </div>
-            </section>
-
-            <!-- SCREEN 3: CHECKLIST -->
-            <section class="app-screen" id="screen-checklist" style="display: none; z-index: 1;">
-              <div class="sys-topbar">
-                <div class="ws-title">📋 開始檢查 — 清單與地圖雙模式作業</div>
-                <div class="ws-tabs"><div class="ws-tab active">📋 清單檢查</div><div class="ws-tab">🗺️ 地圖檢視</div></div>
-              </div>
-              <div class="mod-workspace">
-                <div class="status-4-grid">
-                  <div class="st-card active-filter" id="stCardNeed">
-                    <div><div style="font-size:11px;color:#fca5a5;font-weight:800;">🔴 需檢查</div><div style="font-size:22px;font-weight:900;color:#ef4444;" id="needCountNum">23</div></div>
-                    <span class="pill-badge pill-red">今日到期</span>
-                  </div>
-                  <div class="st-card">
-                    <div><div style="font-size:11px;color:#fde047;font-weight:800;">🟡 可檢查</div><div style="font-size:22px;font-weight:900;color:#f59e0b;">12</div></div>
-                    <span class="pill-badge pill-amber">順路預檢</span>
-                  </div>
-                  <div class="st-card">
-                    <div><div style="font-size:11px;color:#6ee7b7;font-weight:800;">🟢 不需檢查</div><div style="font-size:22px;font-weight:900;color:#10b981;">72</div></div>
-                    <span class="pill-badge pill-green">效期內</span>
-                  </div>
-                  <div class="st-card">
-                    <div><div style="font-size:11px;color:#93c5fd;font-weight:800;">🔵 今日已檢</div><div style="font-size:22px;font-weight:900;color:#38bdf8;" id="doneCountNum">18</div></div>
-                    <span class="pill-badge pill-blue">剛完成</span>
-                  </div>
-                </div>
-
-                <div style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;flex:1;">
-                  <table class="ws-table">
-                    <thead><tr><th>條碼編號</th><th>設備名稱 / 位置</th><th>狀態燈號</th><th>操作</th></tr></thead>
-                    <tbody>
-                      <tr style="background:rgba(239,68,68,0.12);">
-                        <td>FE-A1-008</td><td>泡沫幫浦壓力計 · B1 機房</td>
-                        <td><span class="pill-badge pill-red" id="row8Badge">🔴 需檢查</span></td>
-                        <td><button style="background:#2563eb;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-weight:800;">📷 掃碼開單</button></td>
-                      </tr>
-                      <tr>
-                        <td>FE-A1-009</td><td>10型乾粉滅火器 · 1F 卸貨區</td>
-                        <td><span class="pill-badge pill-red">🔴 需檢查</span></td>
-                        <td><button style="background:#334155;color:#fff;border:none;padding:4px 10px;border-radius:5px;font-weight:800;">開單</button></td>
-                      </tr>
-                    </tbody>
-                  </table>
-
-                  <div style="background:#1e293b;border:2px solid #38bdf8;border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;">
-                    <div>
-                      <div style="font-size:14px;font-weight:900;color:#fde047;margin-bottom:8px;">📝 點檢表單：泡沫幫浦壓力計 (FE-A1-008)</div>
-                      <div style="background:#0f172a;padding:8px 10px;border-radius:6px;margin-bottom:8px;display:flex;justify-content:space-between;">
-                        <span>1. 幫浦本體外觀與閥門開關</span><span class="pill-badge pill-green">✓ 正常</span>
-                      </div>
-                      <div style="background:#0f172a;padding:10px;border-radius:6px;border:1.5px solid #f59e0b;" id="pressureInputRow">
-                        <div style="font-size:11.5px;color:#cbd5e1;margin-bottom:4px;">2. 壓力錶實測讀數（標準：5.0 ~ 6.5 kgf/cm²）</div>
-                        <div style="display:flex;align-items:center;gap:8px;">
-                          <input type="text" id="livePressureInput" value="尚未輸入" readonly="" style="background:#1e293b;border:2px solid #38bdf8;color:#fde047;font-size:15px;font-weight:900;padding:5px 10px;border-radius:6px;width:140px;text-align:center;">
-                          <span class="pill-badge pill-amber" id="liveJudgeBadge">⏳ 等待判讀</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button id="btnSubmitInspect" style="background:linear-gradient(90deg,#10b981,#059669);color:#0f172a;border:none;padding:8px;border-radius:8px;font-weight:900;font-size:13px;">✓ 送出點檢紀錄</button>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- SCREEN 4: MAP -->
-            <section class="app-screen" id="screen-map" style="display: none; z-index: 1;">
-              <div class="sys-topbar">
-                <div class="ws-title">🗺️ 2D 平面圖巡檢 — 四色燈號 × 反向縮放 × 90° 視角旋轉</div>
-                <button class="c-btn active" id="btnRotateMap">🔄 90° 旋轉視角</button>
-              </div>
-              <div class="mod-workspace">
-                <div class="map-canvas-box" id="mapCanvasBox">
-                  <svg viewBox="0 0 900 460" class="floorplan-svg" id="floorplanSvg">
-                    <rect x="20" y="20" width="860" height="420" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-width="2.5"></rect>
-                    <line x1="300" y1="20" x2="300" y2="440" stroke="#334155" stroke-width="2"></line>
-                    <line x1="600" y1="20" x2="600" y2="440" stroke="#334155" stroke-width="2"></line>
-                    <text x="50" y="55" fill="#64748b" font-size="16" font-weight="800">A區 倉儲物流走道</text>
-                    <text x="340" y="55" fill="#64748b" font-size="16" font-weight="800">B區 自動化分揀中心</text>
-                    <text x="640" y="55" fill="#64748b" font-size="16" font-weight="800">C區 消防幫浦與泡沫室</text>
-                  </svg>
-                  <div class="map-pin pin-green" style="left:18%;top:28%;">FE1</div>
-                  <div class="map-pin pin-yellow" style="left:46%;top:32%;">FE2</div>
-                  <div class="map-pin pin-red" id="targetRedPin" style="left:68%;top:45%;">FE3</div>
-                  <div class="map-pin pin-blue" style="left:28%;top:72%;">FE4</div>
-                </div>
-              </div>
-            </section>
-
-            <!-- SCREEN 5: RECHECK -->
-            <section class="app-screen" id="screen-recheck" style="display: none; z-index: 1;">
-              <div class="sys-topbar">
-                <div class="ws-title">⚠️ 異常複檢閉環 &amp; 📜 歷史資料 3 秒官方月報匯出</div>
-                <button class="c-btn active" id="btnExportMonthly">📊 匯出：本月官方月報 (Excel)</button>
-              </div>
-              <div class="mod-workspace" style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
-                <div style="background:#1e293b;border:2px solid #f59e0b;border-radius:12px;padding:14px;position:relative;display:flex;flex-direction:column;justify-content:space-between;" id="recheckCardBox">
-                  <div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-                      <span style="font-size:15px;font-weight:900;color:#fde047;">🛠️ 異常複檢單：1F 消防栓 (HY-102)</span>
-                      <span class="pill-badge pill-red" id="recheckStatusBadge">待複檢</span>
-                    </div>
-                    <div style="font-size:11.5px;color:#cbd5e1;margin-bottom:4px;">⚡ 工務免打字「快速帶入常用改善說明」：</div>
-                    <div id="quickPhraseBox" style="background:#0f172a;border:1.5px solid #38bdf8;padding:8px 10px;border-radius:6px;color:#fde047;font-weight:800;font-size:12.5px;">
-                      點擊選擇常用維修片語...
-                    </div>
-                  </div>
-                  <button id="btnCompleteRecheck" style="background:linear-gradient(90deg,#f59e0b,#d97706);color:#0f172a;border:none;padding:9px;border-radius:8px;font-weight:900;font-size:13px;">✓ 完成複檢結案（自動加蓋核驗章）</button>
-                  <div class="verified-stamp" id="verifiedStamp">💮 FSIPPRO VERIFIED<br><span style="font-size:11px;">已修復核驗合格章</span></div>
-                </div>
-
-                <div style="background:#1e293b;border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;">
-                  <div style="font-size:15px;font-weight:900;color:#93c5fd;margin-bottom:8px;">📜 歷史資料（年度動態分表 · 521 筆毫秒載入）</div>
-                  <div id="exportToastBox" style="background:rgba(16,185,129,0.16);border:1.5px solid #10b981;padding:10px;border-radius:8px;color:#6ee7b7;font-weight:800;font-size:12px;text-align:center;">
-                    📥 支援一鍵產出無亂碼 Excel「本月官方月報」
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <!-- SCREEN 6: EQUIPMENT -->
-            <section class="app-screen" id="screen-equipment" style="display: none; z-index: 1;">
-              <div class="sys-topbar">
-                <div class="ws-title">🏢 我的設備資產 × ➕ 新增設備 (QR渲染) × 📑 分類同步</div>
-              </div>
-              <div class="mod-workspace" style="display:grid;grid-template-columns:1.1fr 1fr;gap:14px;">
-                <div style="background:#1e293b;border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;">
-                  <div>
-                    <div style="font-size:14px;font-weight:900;color:#fde047;margin-bottom:8px;">🏢 我的設備 — 一鍵複製克隆規格</div>
-                    <table class="ws-table">
-                      <thead><tr><th>設備編號 / 名稱</th><th>自定義標籤</th><th>快速克隆</th></tr></thead>
-                      <tbody>
-                        <tr>
-                          <td>FE-101 · 10型乾粉滅火器</td>
-                          <td><span class="pill-badge pill-amber">#高風險區</span></td>
-                          <td><button id="btnCloneEquip" style="background:#2563eb;color:#fff;border:none;padding:3px 8px;border-radius:5px;font-weight:800;">📋 複製</button></td>
-                        </tr>
-                        <tr id="clonedNewRow" style="display:none;background:rgba(16,185,129,0.16);">
-                          <td>FE-102 · 10型滅火器 (新克隆)</td>
-                          <td><span class="pill-badge pill-amber">#高風險區</span></td>
-                          <td><span class="pill-badge pill-green">✓ 完成</span></td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                  <div id="batchFloatingBar" style="background:linear-gradient(90deg,#1e40af,#2563eb);padding:8px 12px;border-radius:8px;font-size:11.5px;font-weight:900;">
-                    ⚡ 浮動批次作業列：[批次改週期] [跨棟移機] [列印條碼]
-                  </div>
-                </div>
-
-                <div style="background:#1e293b;border:2px solid #10b981;border-radius:12px;padding:14px;display:flex;flex-direction:column;justify-content:space-between;">
-                  <div style="display:flex;gap:12px;align-items:center;">
-                    <div style="width:80px;height:80px;background:#fff;border-radius:8px;color:#0f172a;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:18px;">
-                      ▣ QR
-                    </div>
-                    <div style="flex:1;">
-                      <div style="font-size:14px;font-weight:900;color:#6ee7b7;">🖨️ 即時渲染高清 QR 貼紙</div>
-                      <div style="font-size:11px;color:#cbd5e1;margin-top:3px;">綁定公差門檻，修改條碼全系統級聯更新不斷鏈</div>
-                    </div>
-                  </div>
-                  <button id="btnSyncCategory" style="background:#f59e0b;color:#0f172a;border:none;padding:8px;border-radius:8px;font-weight:900;font-size:12.5px;">💾 設備分類：一鍵同步更新全廠 107 具同類設備</button>
-                </div>
-              </div>
-            </section>
+              <!-- [已淨化] 純淨相片畫布圖層 -->
+            
 
             
-            <div class="pop-screen-item active" id="custom-clip-template-01" style="display: flex; z-index: 10;"><img src="images/Sample.jpg" style="width:100%;height:100%;object-fit:contain;"></div></div>
+            <div class="pop-screen-item active" id="custom-clip-template-01" style="display: flex; z-index: 10; position:relative; overflow:hidden;">
+              <div class="clip-backdrop" style="position:absolute; inset:-15%; width:130%; height:130%; background-image:url('images/Sample.jpg'); background-size:cover; background-position:center; filter:blur(30px) brightness(0.65); pointer-events:none; z-index:0;"></div>
+              <img src="images/Sample.jpg" style="position:relative; z-index:1; width:100%; height:100%; object-fit:contain;">
+            </div></div>
 
             <!-- 2D 紅色重點指示框 (可拖曳縮放) -->
             <div class="pop-focus-box" id="focus-box" style="display:none;">
@@ -2710,6 +2435,16 @@
           <button class="pop-btn" id="ruler-paste-btn" style="display:none; padding:1px 8px; font-size:0.7rem; background:#064e3b; color:#a7f3d0; border:1px solid #059669; font-weight:700;" onclick="pasteTimelineClip(currentSceneIdx, event)" title="貼上已複製的片段 (快捷鍵 Ctrl+V)">
             📥 貼上片段
           </button>
+          <!-- 🎵 背景配樂控制膠囊 -->
+          <div style="display:inline-flex; align-items:center; gap:4px; margin-right:4px;">
+            <label style="display:inline-flex; align-items:center; gap:4px; background:#1e1b4b; border:1px solid #6366f1; border-radius:5px; padding:1px 7px; cursor:pointer; font-size:0.7rem; font-weight:800; color:#c7d2fe;" title="點擊選擇電腦中的背景配樂 (支援 MP3/WAV/AAC)">
+              🎵 <span id="ruler-bgm-name">加入配樂</span>
+              <input type="file" id="bgm-file-input" accept="audio/*" style="display:none;" onchange="handleBgmFileSelect(event)">
+            </label>
+            <button type="button" class="pop-btn" id="btn-bgm-toggle" style="display:none; padding:1px 6px; font-size:0.68rem; background:#312e81; color:#e0e7ff; border:1px solid #4f46e5; border-radius:4px;" onclick="toggleBgmPlay(event)" title="試聽/暫停背景音樂">▶</button>
+            <button type="button" class="pop-btn" id="btn-bgm-remove" style="display:none; padding:1px 5px; font-size:0.68rem; background:#450a0a; color:#fca5a5; border:1px solid #ef4444; border-radius:4px;" onclick="removeBgm(event)" title="移除背景音樂">✕</button>
+          </div>
+
           <span style="color:#a7f3d0;">📍 當前播放:</span>
           <span style="color:#facc15; font-weight:800; font-family:monospace;" id="ruler-current-timecode">片段 1 · 00:00 ~ 00:03 (3s)</span>
         </div>
@@ -2844,7 +2579,7 @@
     const sel = document.getElementById('select-sub-size');
     if (sel && sel.value !== size) sel.value = size;
     try {
-      localStorage.setItem('FSIPPRO_SUB_SIZE', size);
+      localStorage.setItem('WCS_SUB_SIZE', size);
     } catch(e) {}
   }
 
@@ -3428,10 +3163,16 @@
         screenEl.id = scene.screen;
         sLayer.appendChild(screenEl);
       }
+      screenEl.style.position = 'relative';
+      screenEl.style.overflow = 'hidden';
       if (scene.customMedia.type === 'video') {
-        screenEl.innerHTML = `<video src="${scene.customMedia.src}" style="width:100%;height:100%;object-fit:contain;" playsinline muted></video>`;
+        screenEl.innerHTML = `
+          <div class="clip-backdrop" style="position:absolute; inset:-15%; width:130%; height:130%; background-image:url('${scene.customMedia.src}'); background-size:cover; background-position:center; filter:blur(30px) brightness(0.65); pointer-events:none; z-index:0;"></div>
+          <video src="${scene.customMedia.src}" style="position:relative; z-index:1; width:100%; height:100%; object-fit:contain;" playsinline muted></video>`;
       } else {
-        screenEl.innerHTML = `<img src="${scene.customMedia.src}" style="width:100%;height:100%;object-fit:contain;">`;
+        screenEl.innerHTML = `
+          <div class="clip-backdrop" style="position:absolute; inset:-15%; width:130%; height:130%; background-image:url('${scene.customMedia.src}'); background-size:cover; background-position:center; filter:blur(30px) brightness(0.65); pointer-events:none; z-index:0;"></div>
+          <img src="${scene.customMedia.src}" style="position:relative; z-index:1; width:100%; height:100%; object-fit:contain;">`;
       }
     }
   }
@@ -4036,28 +3777,43 @@
     if (activeScreen) {
       activeScreen.style.display = 'flex';
       activeScreen.classList.add('active');
+    activeScreen.classList.remove('filter-vintage', 'filter-teal-orange', 'filter-monochrome', 'filter-golden', 'filter-cold');
+    if (scene.colorFilter && scene.colorFilter !== 'none') {
+      activeScreen.classList.add('filter-' + scene.colorFilter);
+    }
+    const filterSel = document.getElementById('select-filter-preset');
+    if (filterSel) filterSel.value = scene.colorFilter || 'none';
     }
 
-    // 運鏡相機
-    const duration = parseFloat(step.motionDuration || 0.85);
-    if (step.fromCam && step.fromBox) {
+    // 運鏡相機 (支援純照片平滑 Ken Burns 運鏡)
+    const duration = parseFloat(step.motionDuration || scene.duration || 1.0);
+    if (step.fromCam) {
       motionWorld.style.transition = 'none';
-      focusBox.style.transition = 'none';
+      if (focusBox) focusBox.style.transition = 'none';
       const [zA, pxA, pyA] = step.fromCam;
       motionWorld.style.transform = `scale(${zA}) translate(${pxA}%, ${pyA}%)`;
-      renderFocusBox(parseBox(step.fromBox), step.tag, 0);
+      if (step.fromBox && !step.hideBox) renderFocusBox(parseBox(step.fromBox), step.tag, 0);
+      void motionWorld.offsetWidth;
 
       setTimeout(() => {
         applyCamTransform(duration);
-        const b = parseBox(step.box);
-        renderFocusBox(b, step.tag, duration);
-        animateMockCursor(b, step.action);
-      }, 150);
+        if (!step.hideBox && step.box) {
+          const b = parseBox(step.box);
+          renderFocusBox(b, step.tag, duration);
+        } else if (focusBox) {
+          focusBox.style.display = 'none';
+        }
+        if (!step.hideCursor) animateMockCursor(parseBox(step.box), step.action);
+      }, 50);
     } else {
       applyCamTransform(duration);
-      const b = parseBox(step.box);
-      renderFocusBox(b, step.tag, duration);
-      animateMockCursor(b, step.action);
+      if (!step.hideBox && step.box) {
+        const b = parseBox(step.box);
+        renderFocusBox(b, step.tag, duration);
+      } else if (focusBox) {
+        focusBox.style.display = 'none';
+      }
+      if (!step.hideCursor) animateMockCursor(parseBox(step.box), step.action);
     }
 
     // 字幕
@@ -4125,7 +3881,7 @@
   }
 
   function startPlayback() {
-    isPlaying = true;
+    isPlaying = true; syncBgmWithPlayback(true);
     if (playBtn) {
       playBtn.textContent = '⏸ 暫停';
       playBtn.classList.remove('primary');
@@ -4139,6 +3895,7 @@
   }
 
   function pausePlayback() {
+    syncBgmWithPlayback(false);
     isPlaying = false;
     stopTypewriter(true);
     if (playBtn) {
@@ -4307,7 +4064,95 @@
     }
   }
 
+  
+  // === 專業相片動畫：外部多張照片批次拖放匯入 (Smart Photo Batch Flow) ===
+  async function handleBatchFilesDrop(fileList) {
+    const files = Array.from(fileList).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name));
+    if (files.length === 0) return;
+
+    const kenburnsSequence = ['zoom-in', 'pan-left', 'zoom-out', 'pan-right', 'diagonal', 'tilt-up'];
+    const addedCount = files.length;
+    const startIndex = SCENES.length;
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const dataUrl = await new Promise((res) => {
+        const r = new FileReader();
+        r.onload = (e) => res(e.target.result);
+        r.readAsDataURL(file);
+      });
+
+      const cleanTitle = file.name.replace(/\.[^/.]+$/, '');
+      const newScene = {
+        chapter: `照片 ${SCENES.length + 1}`,
+        stepNum: String(SCENES.length + 1).padStart(2, '0'),
+        title: cleanTitle,
+        color: typeof getPastelColor === 'function' ? getPastelColor(SCENES.length) : '#38bdf8',
+        duration: 3.5,
+        screen: `custom-clip-${Date.now()}-${i}`,
+        customMedia: { type: 'image', src: dataUrl, filename: file.name },
+        subtitles: [cleanTitle],
+        steps: [
+          {
+            cam: [1.25, 0, 0],
+            fromCam: [1.0, 0, 0],
+            box: [0, 0, 0, 0],
+            hideBox: true,
+            hideCursor: true,
+            tag: '',
+            sub: cleanTitle,
+            action: 'none',
+            motionDuration: 3.5
+          }
+        ]
+      };
+      SCENES.push(newScene);
+      const preset = kenburnsSequence[i % kenburnsSequence.length];
+      applyKenBurnsPreset(preset, SCENES.length - 1);
+    }
+
+    renderTimelineRail();
+    loadStep(startIndex, 0, false);
+    if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(`🎉 成功拖入 ${addedCount} 張照片！已自動分配電影級運鏡！`);
+    }
+  }
+
+  function bindTimelineFileDrop() {
+    const targets = [document.getElementById('timeline-track-rail'), document.getElementById('cinema-stage')];
+    targets.forEach(target => {
+      if (!target || target.dataset.dropBound) return;
+      target.dataset.dropBound = 'true';
+      target.addEventListener('dragover', (e) => {
+        if (e.dataTransfer && e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files')) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+          target.style.outline = '2.5px dashed #38bdf8';
+        }
+      });
+      target.addEventListener('dragleave', (e) => {
+        if (!target.contains(e.relatedTarget)) {
+          target.style.outline = 'none';
+        }
+      });
+      target.addEventListener('drop', (e) => {
+        target.style.outline = 'none';
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name));
+          if (files.length > 0) {
+            e.preventDefault();
+            e.stopPropagation();
+            handleBatchFilesDrop(files);
+          }
+        }
+      });
+    });
+  }
+
   function renderTimelineRail() {
+    bindTimelineFileDrop();
+
     const rail = document.getElementById('timeline-track-rail');
     if (!rail) return;
     rail.innerHTML = '';
@@ -4374,8 +4219,13 @@
 
         <!-- 第三行：時間顯示膠囊 (長度與上方控制項同寬 100%) -->
         <div class="clip-bottom-row" onclick="event.stopPropagation()" style="width:100%;">
-          <div class="clip-time-pill ${isAct ? 'active-pill' : ''}" style="width:100%; height:20px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:4px; font-size:0.72rem; cursor:pointer;" title="點擊自訂秒數" onclick="promptSetClipDuration(${idx}, event)">
-            ⏱️ ${info.startTC} ~ ${info.endTC} (${info.duration}s)
+          <div style="display:flex; align-items:center; gap:3px; width:100%;">
+            <div class="clip-time-pill ${isAct ? 'active-pill' : ''}" style="flex:1; height:20px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:3px; font-size:0.7rem; cursor:pointer;" title="點擊自訂秒數" onclick="promptSetClipDuration(${idx}, event)">
+              ⏱️ ${info.duration}s
+            </div>
+            <button type="button" class="clip-mini-btn" style="background:#312e81; color:#c7d2fe; border:1px solid #4f46e5; border-radius:4px; padding:0 5px; height:20px; font-size:0.68rem; font-weight:800; cursor:pointer; white-space:nowrap;" onclick="event.stopPropagation(); const presets=['zoom-in','zoom-out','pan-left','pan-right','diagonal','static']; const cur=sc.steps?.[0]?.fromCam ? 1 : 0; applyKenBurnsPreset(presets[(cur + 1) % presets.length], ${idx});" title="點擊輪換此照片的運鏡動畫">
+              ${getClipPresetName(sc.steps?.[0])}
+            </button>
           </div>
         </div>
       `;
@@ -4685,7 +4535,7 @@
   // 1. 即時自動快取儲存 (免下載、重新整理永遠保留)
   function autoSaveToStorage() {
     try {
-      localStorage.setItem('FSIPPRO_CUSTOM_SCENES_V2', JSON.stringify(SCENES));
+      localStorage.setItem('WCS_CUSTOM_SCENES_V2', JSON.stringify(SCENES));
       // 提示狀態微調
       const saveBtn = document.getElementById('btn-save-html');
       if (saveBtn) {
@@ -4708,20 +4558,19 @@
   // 2. 開啟網頁時自動還原自訂修改 (若有殘留舊版 9 段 demo 快取則自動清除還原為乾淨範本)
   function loadSavedScenesIfAny() {
     try {
-      const saved = localStorage.getItem('FSIPPRO_CUSTOM_SCENES_V2');
+      const saved = localStorage.getItem('WCS_CUSTOM_SCENES_V2');
       if (saved) {
         const parsed = JSON.parse(saved);
         if (Array.isArray(parsed) && parsed.length > 0) {
           // 如果快取包含舊版系統畫面 (如 screen-auth, 登錄帳號, Google AI Studio 等舊版片段)，徹底清理重設
           const isLegacyOrTest = parsed.some(s => 
             !s.screen || 
-            (s.title && (s.title.includes('登錄') || s.title.includes('AI Studio') || s.title.includes('FSIPPRO') || s.title.includes('滅火器') || s.title.includes('系統首頁123'))) ||
-            (s.steps && s.steps.some(st => st.tag && (st.tag.includes('系統首頁123') || st.tag.includes('25488')))) ||
-            (s.customMedia && s.customMedia.src && s.customMedia.src.startsWith('data:image'))
+            (s.title && (s.title.includes('登錄') || s.title.includes('AI Studio') || s.title.includes('FSIPPRO') || s.title.includes('消防') || s.title.includes('滅火器') || s.title.includes('系統首頁123'))) ||
+            (s.steps && s.steps.some(st => st.tag && (st.tag.includes('系統首頁123') || st.tag.includes('25488'))))
           );
           if (isLegacyOrTest) {
             console.log('🧹 檢測到測試暫存草稿，自動清除重置為原始乾淨範本');
-            localStorage.removeItem('FSIPPRO_CUSTOM_SCENES_V2');
+            localStorage.removeItem('WCS_CUSTOM_SCENES_V2');
             return;
           }
           // 清洗快取中所有片段的殘留紅框，底部紅條一律消除
@@ -4736,7 +4585,7 @@
               });
             }
           });
-          try { localStorage.setItem('FSIPPRO_CUSTOM_SCENES_V2', JSON.stringify(parsed)); } catch(e){}
+          try { localStorage.setItem('WCS_CUSTOM_SCENES_V2', JSON.stringify(parsed)); } catch(e){}
           parsed.forEach((s, idx) => {
             if (s.customMedia) {
               const fName = s.customMedia.filename || s.title || ('圖片_' + (idx + 1));
@@ -4793,7 +4642,7 @@
   function resetToDefaultScenes() {
     if (!confirm('確定要清除瀏覽器快取，恢復成一開始的原始範本狀態嗎？\n\n💡 提示：\n這會清空您先前所有未另存的改動，直接回到一開始乾淨的初始範本。')) return;
     try {
-      localStorage.removeItem('FSIPPRO_CUSTOM_SCENES_V2');
+      localStorage.removeItem('WCS_CUSTOM_SCENES_V2');
     } catch(e) {}
     if (typeof ORIGINAL_TEMPLATE_SCENES !== 'undefined' && Array.isArray(ORIGINAL_TEMPLATE_SCENES)) {
       SCENES = JSON.parse(JSON.stringify(ORIGINAL_TEMPLATE_SCENES));
@@ -5076,7 +4925,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'FSIPPRO_實機錄影_' + targetType + '.' + ext;
+        a.download = 'CinemaStudio_照片動畫錄影_' + targetType + '.' + ext;
         a.click();
 
         if (recBtn) {
@@ -5155,7 +5004,7 @@
 
     // 還原使用者先前儲存的偏好寬度 (預設 420px)
     try {
-      const savedW = localStorage.getItem('FSIPPRO_STUDIO_SPLIT_WIDTH');
+      const savedW = localStorage.getItem('WCS_STUDIO_SPLIT_WIDTH');
       if (savedW) {
         const val = parseInt(savedW, 10);
         if (!isNaN(val) && val >= 260 && val <= window.innerWidth * 0.78) {
@@ -5194,7 +5043,7 @@
         document.body.classList.remove('is-resizing-splitter');
         try {
           const w = parseInt(drawer.style.width, 10);
-          if (w) localStorage.setItem('FSIPPRO_STUDIO_SPLIT_WIDTH', w);
+          if (w) localStorage.setItem('WCS_STUDIO_SPLIT_WIDTH', w);
         } catch(err) {}
         updateScreenScale();
       }
@@ -5220,7 +5069,7 @@
     resizer.addEventListener('dblclick', () => {
       setDrawerWidth(420);
       try {
-        localStorage.removeItem('FSIPPRO_STUDIO_SPLIT_WIDTH');
+        localStorage.removeItem('WCS_STUDIO_SPLIT_WIDTH');
       } catch(e) {}
     });
   }
@@ -5234,7 +5083,7 @@
     document.body.classList.remove('is-recording-clean');
     if (editDrawer) editDrawer.classList.remove('open');
     if (editBtn) editBtn.classList.remove('active');
-    const savedSubSize = localStorage.getItem('FSIPPRO_SUB_SIZE') || 'small';
+    const savedSubSize = localStorage.getItem('WCS_SUB_SIZE') || 'small';
     changeSubtitleSize(savedSubSize);
 
     // 立即重置運鏡與紅框到第 1 個片段初始狀態 (不帶延遲殘留)
@@ -5281,28 +5130,262 @@
     loadStep(0, 0, false);
   });
   
-  // === 實機虛擬畫布 1280x720 雙向高靈敏自適應縮放 (手機/電腦 16:9 完美鎖定、零空白) ===
+  
+  // === 專業相片動畫：畫幅比例系統 (Aspect Ratio System) ===
+  let CURRENT_ASPECT_RATIO = localStorage.getItem('WCS_ASPECT_RATIO') || '16:9';
+
+  
+  // === 專業相片動畫：Ken Burns 經典運鏡預設系統 ===
+  function getClipPresetName(step) {
+    if (!step || !step.fromCam || !step.cam) return '⏹️ 靜止';
+    const [zA, pxA, pyA] = step.fromCam;
+    const [zB, pxB, pyB] = step.cam;
+    if (zA < zB && pxA === pxB && pyA === pyB) return '🔍 推近';
+    if (zA > zB && pxA === pxB && pyA === pyB) return '🔎 拉遠';
+    if (pxA > pxB) return '⬅️ 左移';
+    if (pxA < pxB) return '➡️ 右移';
+    if (pyA > pyB) return '⬆️ 上移';
+    if (pyA < pyB) return '⬇️ 下移';
+    if (zA !== zB) return '↗️ 傾角';
+    return '⏹️ 靜止';
+  }
+
+  
+  // === 專業相片動畫：電影級濾鏡調色系統 ===
+  
+  // === 專業相片動畫：背景配樂系統 (Background Music System) ===
+  let bgmAudio = new Audio();
+  bgmAudio.loop = true;
+  let bgmData = null; // { name, src }
+
+  function handleBgmFileSelect(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      bgmData = { name: file.name, src: evt.target.result };
+      bgmAudio.src = bgmData.src;
+      bgmAudio.currentTime = 0;
+      updateBgmUi();
+      if (typeof showScriptToast === 'function') {
+        showScriptToast(`🎵 已載入背景配樂: ${file.name}`);
+      }
+      if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function toggleBgmPlay(e) {
+    if (e) e.stopPropagation();
+    if (!bgmAudio.src) return;
+    if (bgmAudio.paused) {
+      bgmAudio.play();
+    } else {
+      bgmAudio.pause();
+    }
+    updateBgmUi();
+  }
+
+  function removeBgm(e) {
+    if (e) e.stopPropagation();
+    bgmAudio.pause();
+    bgmAudio.src = '';
+    bgmData = null;
+    updateBgmUi();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('已移除背景配樂');
+    }
+    if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
+  }
+
+  function updateBgmUi() {
+    const nameEl = document.getElementById('ruler-bgm-name');
+    const toggleBtn = document.getElementById('btn-bgm-toggle');
+    const removeBtn = document.getElementById('btn-bgm-remove');
+    if (!nameEl) return;
+
+    if (bgmData && bgmData.name) {
+      const shortName = bgmData.name.length > 10 ? bgmData.name.slice(0, 8) + '...' : bgmData.name;
+      nameEl.textContent = shortName;
+      if (toggleBtn) {
+        toggleBtn.style.display = 'inline-flex';
+        toggleBtn.textContent = bgmAudio.paused ? '▶' : '⏸';
+      }
+      if (removeBtn) removeBtn.style.display = 'inline-flex';
+    } else {
+      nameEl.textContent = '加入配樂';
+      if (toggleBtn) toggleBtn.style.display = 'none';
+      if (removeBtn) removeBtn.style.display = 'none';
+    }
+  }
+
+  // 與全片播放狀態聯動
+  function syncBgmWithPlayback(playing) {
+    if (!bgmAudio || !bgmAudio.src) return;
+    if (playing) {
+      bgmAudio.play().catch(() => {});
+    } else {
+      bgmAudio.pause();
+    }
+    updateBgmUi();
+  }
+
+  function applyFilterPreset(preset, targetIdx = currentSceneIdx) {
+    const scene = SCENES[targetIdx];
+    if (!scene) return;
+    scene.colorFilter = preset || 'none';
+
+    // 應用在 DOM 節點上
+    const screenEl = document.getElementById(scene.screen);
+    if (screenEl) {
+      screenEl.classList.remove('filter-vintage', 'filter-teal-orange', 'filter-monochrome', 'filter-golden', 'filter-cold');
+      if (preset && preset !== 'none') {
+        screenEl.classList.add('filter-' + preset);
+      }
+    }
+
+    if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
+    if (targetIdx === currentSceneIdx && typeof showScriptToast === 'function') {
+      showScriptToast(`已套用相片色調: ${preset}`);
+    }
+  }
+
+  function applyFilterToAll() {
+    const sel = document.getElementById('select-filter-preset');
+    const preset = sel ? sel.value : 'none';
+    SCENES.forEach((s, idx) => {
+      applyFilterPreset(preset, idx);
+    });
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(`已將 [${preset}] 色彩風格批次套用至全片！`);
+    }
+  }
+
+  function applyKenBurnsPreset(preset, targetSceneIdx = currentSceneIdx) {
+    if (!preset) return;
+    const scene = SCENES[targetSceneIdx];
+    if (!scene || !scene.steps || !scene.steps[0]) return;
+    const step = scene.steps[0];
+    const dur = parseFloat(scene.duration || 3.0);
+
+    step.hideBox = true;
+    step.hideCursor = true;
+    step.motionDuration = dur;
+
+    switch (preset) {
+      case 'zoom-in':
+        step.fromCam = [1.0, 0, 0];
+        step.cam = [1.28, 0, 0];
+        break;
+      case 'zoom-out':
+        step.fromCam = [1.28, 0, 0];
+        step.cam = [1.0, 0, 0];
+        break;
+      case 'pan-left':
+        step.fromCam = [1.16, 7, 0];
+        step.cam = [1.16, -7, 0];
+        break;
+      case 'pan-right':
+        step.fromCam = [1.16, -7, 0];
+        step.cam = [1.16, 7, 0];
+        break;
+      case 'tilt-up':
+        step.fromCam = [1.16, 0, 7];
+        step.cam = [1.16, 0, -7];
+        break;
+      case 'tilt-down':
+        step.fromCam = [1.16, 0, -7];
+        step.cam = [1.16, 0, 7];
+        break;
+      case 'diagonal':
+        step.fromCam = [1.06, 5, 5];
+        step.cam = [1.28, -5, -5];
+        break;
+      case 'static':
+        step.fromCam = [1.0, 0, 0];
+        step.cam = [1.0, 0, 0];
+        break;
+    }
+
+    const sliderSpeed = document.getElementById('slider-glide-speed');
+    const valSpeed = document.getElementById('val-glide-speed');
+    if (sliderSpeed) sliderSpeed.value = Math.min(3.0, dur);
+    if (valSpeed) valSpeed.textContent = dur.toFixed(1) + 's';
+
+    renderTimelineRail();
+    if (targetSceneIdx === currentSceneIdx) {
+      previewABGlide();
+    }
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(`已為片段 ${targetSceneIdx + 1} 套用 [${preset}] 運鏡！`);
+    }
+  }
+
+  function applyKenBurnsToAll() {
+    const sel = document.getElementById('select-kenburns-preset');
+    const preset = sel ? sel.value : 'zoom-in';
+    if (!preset) {
+      alert('請先在下拉選單中選擇一種運鏡效果！');
+      return;
+    }
+    SCENES.forEach((_, idx) => {
+      applyKenBurnsPreset(preset, idx);
+    });
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(`已將 [${preset}] 批次套用至全部 ${SCENES.length} 個照片片段！`);
+    }
+  }
+
+  function setAspectRatio(ratio) {
+    CURRENT_ASPECT_RATIO = ratio;
+    try { localStorage.setItem('WCS_ASPECT_RATIO', ratio); } catch(e){}
+    ['16-9', '9-16', '1-1'].forEach(r => {
+      const btn = document.getElementById('btn-aspect-' + r);
+      if (!btn) return;
+      const isAct = (r === ratio.replace(':', '-'));
+      btn.style.background = isAct ? '#0284c7' : 'transparent';
+      btn.style.color = isAct ? '#ffffff' : '#94a3b8';
+    });
+    updateScreenScale();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('已切換畫幅比例: ' + ratio);
+    }
+  }
+
+  // === 實機虛擬畫布 雙向高靈敏自適應縮放 (支援 16:9 / 9:16 / 1:1) ===
   function updateScreenScale() {
     const main = document.querySelector('.pop-main-area');
     const shell = document.getElementById('window-shell');
     const vp = document.getElementById('stage-viewport');
     if (!main || !shell || !vp) return;
 
+    let aspectW = 16, aspectH = 9;
+    let baseVirtualW = 1280;
+    if (CURRENT_ASPECT_RATIO === '9:16') {
+      aspectW = 9; aspectH = 16;
+      baseVirtualW = 720;
+    } else if (CURRENT_ASPECT_RATIO === '1:1') {
+      aspectW = 1; aspectH = 1;
+      baseVirtualW = 1080;
+    }
+
     const isMobile = window.innerWidth <= 768;
     const titlebarH = isMobile ? 26 : 38;
 
     if (isMobile) {
       const padW = 12;
-      const w = Math.min(window.innerWidth - padW, 460);
-      const h = Math.floor(w * (9 / 16));
+      const maxW = Math.min(window.innerWidth - padW, CURRENT_ASPECT_RATIO === '9:16' ? 320 : 460);
+      const w = Math.floor(maxW);
+      const h = Math.floor(w * (aspectH / aspectW));
       shell.style.width = w + 'px';
       shell.style.height = (h + titlebarH) + 'px';
       vp.style.width = w + 'px';
       vp.style.height = h + 'px';
-      const scale = w / 1280;
+      const scale = w / baseVirtualW;
       document.documentElement.style.setProperty('--screen-scale', scale);
     } else {
-            const isEdit = document.body.classList.contains('is-editing');
+      const isEdit = document.body.classList.contains('is-editing');
       const headerEl = document.querySelector('.pop-header');
       const headerH = headerEl ? headerEl.offsetHeight : 50;
       const subWrap = document.querySelector('.pop-subtitle-wrap');
@@ -5310,28 +5393,28 @@
       const timelineShelf = document.getElementById('capcut-timeline-shelf');
       const timelineH = (isEdit && timelineShelf && window.getComputedStyle(timelineShelf).display !== 'none') ? timelineShelf.offsetHeight : 0;
       
-      // 緊湊計算上下保留邊距，徹底消除上下黑邊空隙
       const bottomReserved = isEdit ? (timelineH + 8) : 8;
-      const maxAvailableH = window.innerHeight - headerH - bottomReserved - 4;
-      const availH = Math.max(220, maxAvailableH);
+      const maxAvailableH = window.innerHeight - headerH - bottomReserved - 10;
+      const availH = Math.max(200, maxAvailableH);
       
       const drawerEl = document.getElementById("edit-drawer");
       const leftDrawerW = (isEdit && drawerEl) ? drawerEl.offsetWidth : 0;
-      const availW = Math.max(300, window.innerWidth - leftDrawerW - 16);
+      const availW = Math.max(260, window.innerWidth - leftDrawerW - 24);
 
-      // 解除 1240px 寬度封鎖！在 16:9 比例下自動放大填滿可用高度與寬度
-      const maxWFromH = (availH - titlebarH) * (16 / 9);
+      // 依據比例約束尺寸
+      const maxWFromH = (availH - titlebarH) * (aspectW / aspectH);
       const w = Math.floor(Math.min(availW, maxWFromH));
-      const h = Math.floor(w * (9 / 16));
+      const h = Math.floor(w * (aspectH / aspectW));
 
       shell.style.width = w + 'px';
       shell.style.height = (h + titlebarH) + 'px';
       vp.style.width = w + 'px';
       vp.style.height = h + 'px';
-      const scale = w / 1280;
+      const scale = w / baseVirtualW;
       document.documentElement.style.setProperty('--screen-scale', scale);
     }
   }
+
 
   if (window.ResizeObserver) {
     const ro = new ResizeObserver(() => updateScreenScale());
@@ -5342,7 +5425,10 @@
   }
 
   window.addEventListener('resize', updateScreenScale);
-  window.addEventListener('DOMContentLoaded', updateScreenScale);
+  window.addEventListener('DOMContentLoaded', () => {
+    setAspectRatio(CURRENT_ASPECT_RATIO);
+    updateScreenScale();
+  });
   setTimeout(updateScreenScale, 50);
   setTimeout(updateScreenScale, 200);
 
@@ -5400,7 +5486,7 @@
 
   function downloadScriptCsvTemplate() {
     const csvContent = "\uFEFF圖片路徑,旁白台詞,片段長度(秒),標籤文字\r\n" +
-      "images/01.jpg,歡迎進入消防智能安全檢查系統，請點擊訪客體驗按鈕直接進入系統。,1.5,系統首頁\r\n" +
+      "images/01.jpg,歡迎使用照片動態動畫編輯器！這是為靜態相片注入運鏡生命的全新體驗。,1.5,相片啟動\r\n" +
       "images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水栓設備狀態。,1.5,儀表板概覽\r\n" +
       "images/03.jpg,如發現設備外觀破損或指針壓力異常，請點擊異常通報進行報修。,2.0,異常通報\r\n" +
       "images/04.jpg,巡檢完成後系統自動記錄報告並產生合格證書，維護作業即告完成。,1.5,檢驗合格\r\n";
@@ -5669,7 +5755,7 @@
         💡 您可直接從 Excel 選取整列（含 <b>圖片路徑、旁白台詞、時長、標籤</b>）按 <code>Ctrl+C</code> 複製後貼在此處，按一鍵產生即可！
       </div>
       <textarea id="script-paste-textarea" style="width:100%; height:160px; background:#020617; border:1px solid #334155; border-radius:8px; color:#f1f5f9; font-size:0.76rem; font-family:monospace; padding:8px; box-sizing:border-box; resize:vertical;" placeholder="圖片路徑,旁白台詞,片段長度(秒),標籤文字
-images/01.jpg,歡迎進入消防智能安全檢查系統，請點擊訪客體驗按鈕直接進入系統。,1.5,系統首頁
+images/01.jpg,歡迎使用照片動態動畫編輯器！這是為靜態相片注入運鏡生命的全新體驗。,1.5,相片啟動
 images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水栓設備狀態。,1.5,儀表板概覽"></textarea>
       <div style="display:flex; justify-content:flex-end; gap:8px;">
         <button class="pop-btn" style="background:#334155; color:#cbd5e1; padding:6px 14px;" onclick="closePasteScriptModal()">取消</button>
