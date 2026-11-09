@@ -2498,7 +2498,7 @@
 
 </style>
 </head>
-<body>
+<body class="is-editing">
   <div class="pop-app-shell">
     <!-- 1. 頂部多功能導航控制列 -->
     <header class="pop-header">
@@ -5568,12 +5568,12 @@
       window.addEventListener('DOMContentLoaded', () => {
     initStudioSplitter();
     initCursorDragEvents();
-    // 重新整理一律回到首頁乾淨播放模式 (非編輯頁面)
-    editMode = false;
-    document.body.classList.remove('is-editing');
+    // 專業相片工作站：預設直接開啟編輯工作區 (Studio Mode)
+    editMode = true;
+    document.body.classList.add('is-editing');
     document.body.classList.remove('is-recording-clean');
-    if (editDrawer) editDrawer.classList.remove('open');
-    if (editBtn) editBtn.classList.remove('active');
+    if (editDrawer) editDrawer.classList.add('open');
+    if (editBtn) editBtn.classList.add('active');
     const savedSubSize = localStorage.getItem('WCS_SUB_SIZE') || 'small';
     changeSubtitleSize(savedSubSize);
 
