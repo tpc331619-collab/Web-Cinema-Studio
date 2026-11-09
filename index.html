@@ -3382,6 +3382,8 @@
           const curX = parseFloat(mockCursor.style.left) || 50;
           const curY = parseFloat(mockCursor.style.top) || 50;
           step.cursorPos = [curX, curY];
+          step.cursorB = [curX, curY];
+          updateCursorUIState(false);
           autoSaveToStorage();
         }
       }
@@ -3567,7 +3569,7 @@
     autoSaveToStorage();
   }
 
-  function updateCursorUIState() {
+  function updateCursorUIState(resetCursorPosition = false) {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     const btn = document.getElementById('btn-toggle-cursor');
     const statusSpan = document.getElementById('cursor-ab-status');
@@ -3595,9 +3597,15 @@
       mockCursor.classList.remove('is-hidden');
       mockCursor.classList.add('visible');
       mockCursor.style.display = 'block';
-      const pos = (step.cursorPos && Array.isArray(step.cursorPos)) ? step.cursorPos : [50, 50];
-      mockCursor.style.left = pos[0] + '%';
-      mockCursor.style.top = pos[1] + '%';
+
+      // 僅在明確需要重設 (且非播放動畫中) 時才覆寫游標 DOM 位置，避免打斷 A->B 滑行
+      if (resetCursorPosition && !isPlaying) {
+        const pos = step.cursorPos || step.cursorB || (step.fromCursorPos || step.cursorA) || [50, 50];
+        mockCursor.style.transition = 'none';
+        mockCursor.style.left = pos[0] + '%';
+        mockCursor.style.top = pos[1] + '%';
+      }
+
       if (btn) {
         btn.innerHTML = '游標：顯示中';
         btn.style.background = '#064e3b';
@@ -3606,7 +3614,7 @@
       }
     }
 
-    const curDur = parseFloat(step.glideDuration || step.motionDuration || 0.8);
+    const curDur = parseFloat(step.glideDuration || step.cursorDuration || step.motionDuration || 0.8);
     const durLbl = document.getElementById('val-cursor-duration');
     if (durLbl) durLbl.textContent = curDur.toFixed(1) + 's';
     const durSlider = document.getElementById('slider-cursor-duration');
@@ -3617,35 +3625,47 @@
       selTiming.value = (step.clickAction === 'none' || step.clickDelay === 'none') ? 'none' : '0';
     }
 
+    const pointA = step.fromCursorPos || step.cursorA;
+    const pointB = step.cursorPos || step.cursorB;
+
+    if (btnA) {
+      if (pointA && Array.isArray(pointA)) {
+        btnA.style.background = '#14532d';
+        btnA.style.borderColor = '#22c55e';
+        btnA.style.color = '#86efac';
+        btnA.innerHTML = 'A點已就緒';
+      } else {
+        btnA.style.background = '#18181b';
+        btnA.style.borderColor = '#3f3f46';
+        btnA.style.color = '#f4f4f5';
+        btnA.innerHTML = 'A點';
+      }
+    }
+
     if (btnB) {
-      btnB.innerHTML = 'B點';
+      if (pointB && Array.isArray(pointB)) {
+        btnB.style.background = '#1e3a5f';
+        btnB.style.borderColor = '#38bdf8';
+        btnB.style.color = '#bae6fd';
+        btnB.innerHTML = 'B點已就緒';
+      } else {
+        btnB.style.background = '#18181b';
+        btnB.style.borderColor = '#3f3f46';
+        btnB.style.color = '#f4f4f5';
+        btnB.innerHTML = 'B點';
+      }
     }
 
     if (statusSpan) {
-      if (step.fromCursorPos && step.cursorPos) {
-        statusSpan.innerHTML = `A(${step.fromCursorPos[0]}%, ${step.fromCursorPos[1]}%) → B(${step.cursorPos[0]}%, ${step.cursorPos[1]}%)`;
+      if (pointA && pointB) {
+        statusSpan.innerHTML = `A(${pointA[0].toFixed(0)}%, ${pointA[1].toFixed(0)}%) → B(${pointB[0].toFixed(0)}%, ${pointB[1].toFixed(0)}%)`;
         statusSpan.style.color = '#38bdf8';
-        if (btnA) {
-          btnA.style.background = '#dcfce7';
-          btnA.style.borderColor = '#16a34a';
-          btnA.innerHTML = 'A點已就緒';
-        }
-      } else if (step.cursorPos) {
-        statusSpan.innerHTML = `固定於 B(${step.cursorPos[0]}%, ${step.cursorPos[1]}%)`;
+      } else if (pointB) {
+        statusSpan.innerHTML = `固定於 B(${pointB[0].toFixed(0)}%, ${pointB[1].toFixed(0)}%)`;
         statusSpan.style.color = '#94a3b8';
-        if (btnA) {
-          btnA.style.background = '#ecfdf5';
-          btnA.style.borderColor = '#a7f3d0';
-          btnA.innerHTML = 'A點';
-        }
       } else {
-        statusSpan.innerHTML = `(單點固定)`;
-        statusSpan.style.color = '#94a3b8';
-        if (btnA) {
-          btnA.style.background = '#ecfdf5';
-          btnA.style.borderColor = '#a7f3d0';
-          btnA.innerHTML = 'A點';
-        }
+        statusSpan.innerHTML = '未設定軌跡';
+        statusSpan.style.color = '#71717a';
       }
     }
   }
@@ -3722,10 +3742,10 @@
     const curLeft = parseFloat(mockCursor.style.left) || 50;
     const curTop = parseFloat(mockCursor.style.top) || 50;
     step.fromCursorPos = [curLeft, curTop];
-    // step.hideCursor = true;
+    step.cursorA = [curLeft, curTop];
     mockCursor.classList.remove('is-hidden');
     mockCursor.classList.add('visible');
-    updateCursorUIState();
+    updateCursorUIState(false);
     autoSaveToStorage();
   }
 
@@ -3735,20 +3755,22 @@
     const curLeft = parseFloat(mockCursor.style.left) || 50;
     const curTop = parseFloat(mockCursor.style.top) || 50;
     step.cursorPos = [curLeft, curTop];
-    // step.hideCursor = true;
+    step.cursorB = [curLeft, curTop];
     mockCursor.classList.remove('is-hidden');
     mockCursor.classList.add('visible');
-    updateCursorUIState();
+    updateCursorUIState(false);
     autoSaveToStorage();
   }
 
   function previewCursorABGlide() {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!step || !mockCursor) return;
-    const startX = (step.fromCursorPos && Array.isArray(step.fromCursorPos)) ? step.fromCursorPos[0] : 15;
-    const startY = (step.fromCursorPos && Array.isArray(step.fromCursorPos)) ? step.fromCursorPos[1] : 20;
-    const targetX = (step.cursorPos && Array.isArray(step.cursorPos)) ? step.cursorPos[0] : 50;
-    const targetY = (step.cursorPos && Array.isArray(step.cursorPos)) ? step.cursorPos[1] : 50;
+    const pointA = step.fromCursorPos || step.cursorA || [15, 20];
+    const pointB = step.cursorPos || step.cursorB || [50, 50];
+    const startX = pointA[0];
+    const startY = pointA[1];
+    const targetX = pointB[0];
+    const targetY = pointB[1];
     const dur = parseFloat(step.glideDuration || step.cursorDuration || step.motionDuration || 0.8);
 
     mockCursor.classList.remove('is-hidden');
@@ -3762,7 +3784,7 @@
 
     const isNone = (step.clickAction === 'none' || step.clickDelay === 'none');
 
-    // 2. 極致平穩優雅的教學滑行曲線 (easeInOutQuad: 均勻平滑勻速前進，長距 3~5 秒絲滑沉浸)
+    // 2. 極致平穩優雅的教學滑行曲線
     setTimeout(() => {
       mockCursor.style.transition = `left ${dur}s cubic-bezier(0.45, 0.05, 0.55, 0.95), top ${dur}s cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
       mockCursor.style.left = targetX + '%';
@@ -3773,7 +3795,7 @@
           triggerCursorClickEffect();
         }, dur * 1000 + 50);
       }
-    }, 80);
+    }, 50);
   }
 
   
@@ -3865,7 +3887,7 @@
   }
 
   // 播放與步驟載入時游標動畫演算法 (支援 A→B 滑行)
-    function animateMockCursor(targetBox, action = null, motionDuration = 0.85) {
+  function animateMockCursor(targetBox, action = null, motionDuration = null) {
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!mockCursor) return;
 
@@ -3877,10 +3899,13 @@
     mockCursor.classList.remove('is-hidden');
     mockCursor.classList.add('visible');
 
+    const pointA = step?.fromCursorPos || step?.cursorA;
+    const pointB = step?.cursorPos || step?.cursorB;
+
     let targetX, targetY;
-    if (step && step.cursorPos && Array.isArray(step.cursorPos)) {
-      targetX = step.cursorPos[0];
-      targetY = step.cursorPos[1];
+    if (pointB && Array.isArray(pointB)) {
+      targetX = pointB[0];
+      targetY = pointB[1];
     } else if (targetBox) {
       targetX = targetBox.x + targetBox.w * 0.55;
       targetY = targetBox.y + targetBox.h * 0.55;
@@ -3889,13 +3914,13 @@
       targetY = 50;
     }
 
-    const dur = parseFloat(step?.glideDuration || step?.motionDuration || 0.8);
+    const dur = parseFloat(motionDuration || step?.glideDuration || step?.cursorDuration || step?.motionDuration || 0.8);
     const isNone = step && (step.clickAction === 'none' || step.clickDelay === 'none');
 
     // 若有設定游標 A 點 (起點)，從 A 點平滑滑行到 B 點
-    if (step && step.fromCursorPos && Array.isArray(step.fromCursorPos)) {
-      const startX = step.fromCursorPos[0];
-      const startY = step.fromCursorPos[1];
+    if (pointA && Array.isArray(pointA)) {
+      const startX = pointA[0];
+      const startY = pointA[1];
 
       mockCursor.style.transition = 'none';
       mockCursor.style.left = startX + '%';
@@ -3912,7 +3937,7 @@
             triggerCursorClickEffect();
           }, dur * 1000 + 40);
         }
-      }, 80);
+      }, 50);
     } else {
       mockCursor.style.transition = `left ${dur}s cubic-bezier(0.45, 0.05, 0.55, 0.95), top ${dur}s cubic-bezier(0.45, 0.05, 0.55, 0.95)`;
       mockCursor.style.left = targetX + '%';
@@ -4493,6 +4518,15 @@
 
     // 運鏡相機 (支援純照片平滑 Ken Burns 運鏡)
     const duration = parseFloat(step.motionDuration || scene.duration || 1.0);
+    if (!step.hideCursor && mockCursor) {
+      const pointA = step.fromCursorPos || step.cursorA;
+      if (pointA && Array.isArray(pointA)) {
+        mockCursor.style.transition = 'none';
+        mockCursor.style.left = pointA[0] + '%';
+        mockCursor.style.top = pointA[1] + '%';
+        void mockCursor.offsetWidth;
+      }
+    }
     if (step.fromCam) {
       motionWorld.style.transition = 'none';
       if (focusBox) focusBox.style.transition = 'none';
