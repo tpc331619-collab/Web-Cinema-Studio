@@ -5269,8 +5269,89 @@
     }
   }
 
-  // ================= 智慧自動儲存與直接覆蓋存檔核心 =================
+  // ================= 智慧自動儲存與直接覆蓋存檔核心 (IndexedDB 持久化 FileHandle) =================
   let currentFileHandle = null;
+  const DB_NAME = 'WCS_STORAGE_DB';
+  const STORE_NAME = 'file_handles';
+
+  function getHandleDB() {
+    return new Promise((resolve) => {
+      if (!window.indexedDB) return resolve(null);
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE_NAME)) {
+          db.createObjectStore(STORE_NAME);
+        }
+      };
+      req.onsuccess = (e) => resolve(e.target.result);
+      req.onerror = () => resolve(null);
+    });
+  }
+
+  async function saveHandleToIDB(handle) {
+    try {
+      const db = await getHandleDB();
+      if (!db) return;
+      const tx = db.transaction(STORE_NAME, 'readwrite');
+      tx.objectStore(STORE_NAME).put(handle, 'active_project_handle');
+      updateSaveBtnLabel(handle.name);
+    } catch(e) {}
+  }
+
+  async function getHandleFromIDB() {
+    try {
+      const db = await getHandleDB();
+      if (!db) return null;
+      return new Promise((resolve) => {
+        const tx = db.transaction(STORE_NAME, 'readonly');
+        const req = tx.objectStore(STORE_NAME).get('active_project_handle');
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      });
+    } catch(e) {
+      return null;
+    }
+  }
+
+  function updateSaveBtnLabel(fileName) {
+    const btn = document.getElementById('btn-save-html');
+    if (btn && fileName) {
+      btn.title = `直接原檔覆蓋儲存至「${fileName}」 (Ctrl+S)`;
+    }
+  }
+
+  function showSaveToast(msg, isSuccess = true, duration = 2600) {
+    let t = document.getElementById('studio-save-toast');
+    if (!t) {
+      t = document.createElement('div');
+      t.id = 'studio-save-toast';
+      t.style.cssText = 'position:fixed; top:52px; left:50%; transform:translateX(-50%) translateY(-10px); background:#09090b; color:#22c55e; border:1px solid #27272a; border-left:4px solid #22c55e; padding:8px 20px; border-radius:6px; font-size:0.8rem; font-weight:700; z-index:999999; box-shadow:0 8px 30px rgba(0,0,0,0.7); pointer-events:none; transition:opacity 0.25s ease, transform 0.25s ease; opacity:0; display:flex; align-items:center; gap:8px;';
+      document.body.appendChild(t);
+    }
+    t.style.borderColor = isSuccess ? '#27272a' : '#7f1d1d';
+    t.style.borderLeftColor = isSuccess ? '#22c55e' : '#ef4444';
+    t.style.color = isSuccess ? '#22c55e' : '#f87171';
+    t.innerHTML = msg;
+    t.style.opacity = '1';
+    t.style.transform = 'translateX(-50%) translateY(0)';
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => {
+      t.style.opacity = '0';
+      t.style.transform = 'translateX(-50%) translateY(-10px)';
+    }, duration);
+  }
+
+  // 頁面初始化時，自動由 IndexedDB 恢復上次綁定的檔案 Handle
+  (async function restoreProjectFileHandle() {
+    try {
+      const savedHandle = await getHandleFromIDB();
+      if (savedHandle) {
+        currentFileHandle = savedHandle;
+        updateSaveBtnLabel(savedHandle.name);
+      }
+    } catch(e) {}
+  })();
 
   // 1. 即時自動快取儲存 (免下載、重新整理永遠保留)
   function autoSaveToStorage() {
@@ -5398,7 +5479,7 @@
     alert('🎉 已成功還原為一開始的初始範本狀態！');
   }
 
-  // 4. 直接原檔覆蓋儲存 (支援現代 File System Access API，絕不產生 (1).html 副本)
+  // 4. 直接原檔覆蓋儲存 (第 1 次另存綁定後，第 2 次起直接一鍵/Ctrl+S 覆蓋，絕不再跳彈窗)
   async function saveUpdatedHtml() {
     autoSaveToStorage();
     const updatedScenes = JSON.stringify(SCENES, null, 2);
@@ -5409,30 +5490,57 @@
     if ('showSaveFilePicker' in window) {
       try {
         if (!currentFileHandle) {
+          currentFileHandle = await getHandleFromIDB();
+        }
+
+        // 若已有 handle，驗證權限（通常同源下為 granted，無需任何視窗）
+        if (currentFileHandle) {
+          try {
+            let perm = await currentFileHandle.queryPermission({ mode: 'readwrite' });
+            if (perm !== 'granted') {
+              perm = await currentFileHandle.requestPermission({ mode: 'readwrite' });
+              if (perm !== 'granted') {
+                currentFileHandle = null;
+              }
+            }
+          } catch(err) {
+            currentFileHandle = null;
+          }
+        }
+
+        // 僅在「第 1 次存檔」或尚未綁定檔案時才跳出 Windows 存檔對話框
+        if (!currentFileHandle) {
           currentFileHandle = await window.showSaveFilePicker({
             suggestedName: '編輯模板.html',
             types: [{ description: 'HTML 網頁檔案', accept: { 'text/html': ['.html'] } }]
           });
+          await saveHandleToIDB(currentFileHandle);
         }
+
+        // 直接原檔覆蓋寫入，不彈窗
         const writable = await currentFileHandle.createWritable();
         await writable.write(htmlContent);
         await writable.close();
-        alert('🎉 儲存成功！已直接原檔覆蓋，下次開啟將永遠以乾淨播放模式啟動！');
+
+        const timeStr = new Date().toTimeString().split(' ')[0];
+        showSaveToast(`🎉 儲存成功！已直接覆蓋「${currentFileHandle.name || '檔案'}」 (${timeStr})`);
         return;
       } catch (err) {
         if (err.name === 'AbortError') return;
+        console.warn('showSaveFilePicker error', err);
       }
     }
 
+    // fallback: 瀏覽器下載
     const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = '編輯模板.html';
     a.click();
-    alert('🎉 修改已成功儲存！下次開啟將永遠以乾淨播放模式啟動！');
+    showSaveToast('🎉 修改已成功儲存！');
   }
 
-  // 另存新檔功能 (跳出檔案選擇對話框自由指定檔名或下載新副本)
+  // 另存新檔功能 (明確想要另存新副本時調用，自由指定檔名並將後續覆蓋目標切換為新檔)
   async function saveAsNewHtml() {
     autoSaveToStorage();
     const updatedScenes = JSON.stringify(SCENES, null, 2);
@@ -5451,7 +5559,13 @@
         const writable = await handle.createWritable();
         await writable.write(htmlContent);
         await writable.close();
-        alert('🎉 另存新檔成功！已保存為新檔案。');
+
+        // 另存後自動將後續「存檔 (Ctrl+S)」的目標更新為這個新檔案
+        currentFileHandle = handle;
+        await saveHandleToIDB(handle);
+
+        const timeStr = new Date().toTimeString().split(' ')[0];
+        showSaveToast(`🎉 另存新檔成功！已保存為「${handle.name}」 (${timeStr})`);
         return;
       } catch (err) {
         if (err.name === 'AbortError') return;
@@ -5469,7 +5583,7 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    alert('🎉 另存新檔完成！檔案已下載至您的電腦。');
+    showSaveToast('🎉 另存新檔完成！');
   }
 
   // 支援鍵盤 Ctrl + S 一鍵儲存
