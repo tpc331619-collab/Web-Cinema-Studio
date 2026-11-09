@@ -2006,6 +2006,242 @@
     box-shadow: 0 0 0 2px #ef4444, 0 0 20px rgba(239, 68, 68, 0.5) !important;
   }
 
+
+  /* ================= 🖤 專業黑灰白 Studio 工業風格體系 (Monochrome Pro) ================= */
+  :root {
+    --bg-sun-1: #09090b !important;
+    --bg-sun-2: #121214 !important;
+    --bg-sun-3: #18181b !important;
+    --border-dark: #27272a !important;
+    --coral-accent: #ffffff !important;
+    --sunny-yellow: #e4e4e7 !important;
+    --mint-green: #a1a1aa !important;
+    --bubble-gum: #71717a !important;
+    --card-shadow: 0 4px 12px rgba(0,0,0,0.5) !important;
+    --card-shadow-lg: 0 8px 24px rgba(0,0,0,0.7) !important;
+  }
+
+  html, body {
+    background-color: #09090b !important;
+    color: #f4f4f5 !important;
+  }
+
+  /* 頂部導航列全面深黑金屬感 */
+  .pop-header {
+    background: #0d0d10 !important;
+    border-bottom: 1px solid #27272a !important;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6) !important;
+    color: #f4f4f5 !important;
+  }
+
+  .pop-brand-badge {
+    background: #27272a !important;
+    border: 1px solid #3f3f46 !important;
+    box-shadow: none !important;
+  }
+  .pop-brand-text {
+    color: #f4f4f5 !important;
+  }
+  .pop-brand-text span {
+    color: #a1a1aa !important;
+  }
+
+  /* 統一所有通用按鈕為黑灰白純粹層次 */
+  .pop-btn {
+    background: #18181b !important;
+    color: #d4d4d8 !important;
+    border: 1px solid #27272a !important;
+    box-shadow: none !important;
+    transition: all 0.15s ease !important;
+  }
+  .pop-btn:hover {
+    background: #27272a !important;
+    color: #ffffff !important;
+    border-color: #52525b !important;
+    transform: none !important;
+  }
+  .pop-btn:active {
+    background: #3f3f46 !important;
+    transform: none !important;
+  }
+
+  /* 特殊按鈕黑白專業定制 */
+  #btn-save-html, .save-btn {
+    background: #ffffff !important;
+    color: #09090b !important;
+    border: 1px solid #ffffff !important;
+    font-weight: 800 !important;
+  }
+  #btn-save-html:hover, .save-btn:hover {
+    background: #e4e4e7 !important;
+    color: #000000 !important;
+  }
+
+  #btn-save-as-html, .save-as-btn {
+    background: #18181b !important;
+    color: #f4f4f5 !important;
+    border: 1px solid #3f3f46 !important;
+  }
+
+  #btn-edit-mode, .edit-btn {
+    background: #27272a !important;
+    color: #ffffff !important;
+    border: 1px solid #3f3f46 !important;
+  }
+
+  #btn-voice-toggle {
+    background: #18181b !important;
+    color: #71717a !important;
+    border: 1px solid #27272a !important;
+  }
+
+  #btn-reset-template {
+    background: #18181b !important;
+    color: #71717a !important;
+    border: 1px solid #27272a !important;
+  }
+  #btn-reset-template:hover {
+    background: #27272a !important;
+    color: #e4e4e7 !important;
+    border-color: #3f3f46 !important;
+  }
+
+  #btn-record-video, .rec-btn {
+    background: #18181b !important;
+    color: #f4f4f5 !important;
+    border: 1px solid #3f3f46 !important;
+  }
+  #btn-record-video.recording {
+    background: #27272a !important;
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    animation: studioPulse 1.5s infinite !important;
+  }
+
+  @keyframes studioPulse {
+    0% { border-color: #ffffff; }
+    50% { border-color: #71717a; }
+    100% { border-color: #ffffff; }
+  }
+
+  /* 播放器視窗外殼 */
+  .pop-window-shell {
+    background: #09090b !important;
+    border: 1px solid #27272a !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8) !important;
+  }
+  .pop-mac-titlebar {
+    background: #121214 !important;
+    border-bottom: 1px solid #1e1e24 !important;
+  }
+  .pop-dot {
+    opacity: 0.6 !important;
+  }
+
+  /* 徹底隱藏紅框、標籤與模擬滑鼠 (相片動畫純淨化) */
+  #focus-box, .pop-focus-box,
+  #focus-tag, .pop-focus-tag,
+  #mock-cursor, .pop-mock-cursor {
+    display: none !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+
+  /* 左側編輯抽屜全面深色工業化 */
+  .pop-edit-drawer {
+    background: #121214 !important;
+    border-right: 1px solid #27272a !important;
+    color: #f4f4f5 !important;
+  }
+  .drawer-header {
+    background: #121214 !important;
+    border-bottom: 1px solid #27272a !important;
+  }
+  .pop-tab-btn {
+    background: #18181b !important;
+    color: #a1a1aa !important;
+    border: 1px solid #27272a !important;
+  }
+  .pop-tab-btn.active {
+    background: #27272a !important;
+    color: #ffffff !important;
+    border-color: #52525b !important;
+  }
+
+  /* 時間軸底欄全黑金屬感 */
+  .capcut-timeline-shelf {
+    background: #09090b !important;
+    border-top: 1px solid #27272a !important;
+  }
+  .capcut-ruler-bar {
+    background: #0d0d10 !important;
+    border-bottom: 1px solid #1e1e24 !important;
+    color: #a1a1aa !important;
+  }
+
+  /* 時間軸卡片深灰黑 Studio 化 */
+  .timeline-clip-item {
+    background: #18181b !important;
+    border: 1px solid #27272a !important;
+    border-radius: 8px !important;
+    box-shadow: none !important;
+  }
+  .timeline-clip-item:hover {
+    border-color: #52525b !important;
+  }
+  .timeline-clip-item.active {
+    background: #1e1e24 !important;
+    border: 1.5px solid #ffffff !important;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.12) !important;
+  }
+  .clip-badge-pill {
+    background: #27272a !important;
+    color: #f4f4f5 !important;
+    border: 1px solid #3f3f46 !important;
+    border-radius: 4px !important;
+  }
+  .clip-mini-btn {
+    background: #27272a !important;
+    color: #d4d4d8 !important;
+    border: 1px solid #3f3f46 !important;
+  }
+  .clip-mini-btn:hover {
+    background: #3f3f46 !important;
+    color: #ffffff !important;
+  }
+  .clip-time-pill {
+    background: #121214 !important;
+    color: #a1a1aa !important;
+    border: 1px solid #27272a !important;
+  }
+  .clip-time-pill.active-pill {
+    background: #27272a !important;
+    color: #ffffff !important;
+    border-color: #52525b !important;
+  }
+
+  /* 播放進度條純白黑灰 */
+  .pop-timeline-track {
+    background: #27272a !important;
+  }
+  .pop-timeline-fill {
+    background: #ffffff !important;
+  }
+  .pop-timeline-cursor {
+    background: #ffffff !important;
+    box-shadow: 0 0 8px rgba(255,255,255,0.8) !important;
+  }
+
+  /* 頂部播放按鈕純黑白 */
+  .play-main-btn {
+    background: #ffffff !important;
+    color: #000000 !important;
+    border: 1px solid #ffffff !important;
+  }
+  .play-main-btn:hover {
+    background: #e4e4e7 !important;
+  }
+
 </style>
 </head>
 <body>
@@ -2022,7 +2258,7 @@
         <div class="pop-header-actions" style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
           <!-- 畫幅比例切換器 (Aspect Ratio) -->
           <div class="pop-aspect-selector" style="display:inline-flex; align-items:center; background:#1e293b; border-radius:6px; padding:2px; border:1.5px solid #334155; gap:2px;">
-            <button type="button" class="aspect-btn" id="btn-aspect-16-9" onclick="setAspectRatio('16:9')" title="16:9 橫向 (YouTube / 簡報)" style="border:none; background:#0284c7; color:#fff; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">16:9</button>
+            <button type="button" class="aspect-btn" id="btn-aspect-16-9" onclick="setAspectRatio('16:9')" title="16:9 橫向 (YouTube / 簡報)" style="border:none; background:#ffffff; color:#000; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">16:9</button>
             <button type="button" class="aspect-btn" id="btn-aspect-9-16" onclick="setAspectRatio('9:16')" title="9:16 直向 (Shorts / Reels / TikTok)" style="border:none; background:transparent; color:#94a3b8; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">9:16</button>
             <button type="button" class="aspect-btn" id="btn-aspect-1-1" onclick="setAspectRatio('1:1')" title="1:1 正方形 (IG 貼文)" style="border:none; background:transparent; color:#94a3b8; font-weight:800; font-size:0.72rem; padding:3px 7px; border-radius:4px; cursor:pointer;">1:1</button>
           </div>
@@ -2074,7 +2310,8 @@
                 <!-- 1: 鏡頭、紅框與滑鼠操作 (精簡俐落 · 零冗餘干擾) -->
         <div class="pop-tab-panel active" id="tab-panel-cam" style="display:flex; flex-direction:column; gap:8px;">
 
-          <!-- 1️⃣ 紅框與標籤專區 (紅色系) -->
+          <!-- [已隱藏紅框專區] -->
+          <div style="display:none !important;"><!-- 1️⃣ 紅框與標籤專區 (紅色系) -->
           <div style="background:#0f172a; border:1px solid #7f1d1d; border-left:4px solid #ef4444; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
               <span style="font-size:0.75rem; font-weight:900; color:#fca5a5; display:flex; align-items:center; gap:5px;">
@@ -2148,9 +2385,10 @@
           </div>
 
           <!-- 2 鏡頭縮放與運鏡專區 (紫色系，乾淨俐落) -->
-          <div style="background:#0f172a; border:1px solid #581c87; border-left:4px solid #a855f7; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+          </div>
+          <div style="background:#18181b; border:1px solid #27272a; border-left:3px solid #71717a; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
-              <span style="font-size:0.75rem; font-weight:900; color:#d8b4fe; display:flex; align-items:center; gap:5px;">
+              <span style="font-size:0.75rem; font-weight:900; color:#f4f4f5; display:flex; align-items:center; gap:5px;">
                 2 鏡頭縮放與運鏡
               </span>
               <button class="pop-btn" style="padding:2px 8px; font-size:0.68rem; background:#1e293b; color:#cbd5e1; border:1px solid #475569; border-radius:5px;" onclick="resetCameraCenter()" title="鏡頭重設歸位">歸位</button>
@@ -2160,7 +2398,7 @@
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
               <span style="font-size:0.7rem; font-weight:800; color:#cbd5e1; white-space:nowrap;">縮放:</span>
               <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepZoom(-0.2)">-</button>
-              <span style="font-size:0.75rem; font-weight:800; color:#38bdf8; min-width:34px; text-align:center;" id="val-cam-zoom">1.00x</span>
+              <span style="font-size:0.75rem; font-weight:800; color:#ffffff; min-width:34px; text-align:center;" id="val-cam-zoom">1.00x</span>
               <button class="pop-btn" style="padding:2px 6px; font-size:0.68rem;" onclick="stepZoom(0.2)">+</button>
               <div style="display:inline-flex; gap:3px; flex-shrink:0;">
                 <button class="pop-btn" style="padding:2px 6px; font-size:0.67rem;" onclick="setCamPreset(0.2, 0, 0)">0.2x</button>
@@ -2173,8 +2411,8 @@
 
                         <!-- 電影級相片濾鏡預設 -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
-              <span style="font-size:0.72rem; font-weight:800; color:#38bdf8; white-space:nowrap;">🎨 色彩風格:</span>
-              <select id="select-filter-preset" onchange="applyFilterPreset(this.value)" style="background:#0c4a6e; color:#e0f2fe; border:1px solid #0284c7; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
+              <span style="font-size:0.72rem; font-weight:800; color:#ffffff; white-space:nowrap;">🎨 色彩風格:</span>
+              <select id="select-filter-preset" onchange="applyFilterPreset(this.value)" style="background:#18181b; color:#f4f4f5; border:1px solid #3f3f46; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
                 <option value="none">🌈 自然原色 (Natural)</option>
                 <option value="vintage">🎞️ 復古底片 (Warm Vintage)</option>
                 <option value="teal-orange">🎬 電影青橙 (Teal & Orange)</option>
@@ -2182,13 +2420,13 @@
                 <option value="cold">❄️ 冷冽電影 (Cold Cinema)</option>
                 <option value="monochrome">🖤 經典黑白 (Classic B&W)</option>
               </select>
-              <button class="pop-btn" type="button" style="background:#0369a1; color:#e0f2fe; border:1px solid #0284c7; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyFilterToAll()" title="將此色彩風格套用至所有照片片段">全部套用</button>
+              <button class="pop-btn" type="button" style="background:#27272a; color:#ffffff; border:1px solid #52525b; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyFilterToAll()" title="將此色彩風格套用至所有照片片段">全部套用</button>
             </div>
 
             <!-- Ken Burns 照片運鏡預設選單 -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
-              <span style="font-size:0.72rem; font-weight:800; color:#f472b6; white-space:nowrap;">🎬 動畫預設:</span>
-              <select id="select-kenburns-preset" onchange="applyKenBurnsPreset(this.value)" style="background:#1e1b4b; color:#e0e7ff; border:1px solid #6366f1; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
+              <span style="font-size:0.72rem; font-weight:800; color:#a1a1aa; white-space:nowrap;">🎬 動畫預設:</span>
+              <select id="select-kenburns-preset" onchange="applyKenBurnsPreset(this.value)" style="background:#18181b; color:#f4f4f5; border:1px solid #3f3f46; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
                 <option value="">⚡ 選擇經典照片運鏡...</option>
                 <option value="zoom-in">🔍 慢速推近 (Zoom In)</option>
                 <option value="zoom-out">🔎 特寫拉遠 (Zoom Out)</option>
@@ -2199,28 +2437,28 @@
                 <option value="diagonal">↗️ 傾角推鏡 (Diagonal Zoom)</option>
                 <option value="static">⏹️ 靜止畫面 (Static)</option>
               </select>
-              <button class="pop-btn" type="button" style="background:#4338ca; color:#e0e7ff; border:1px solid #6366f1; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyKenBurnsToAll()" title="將此動畫預設套用至所有照片片段">全部套用</button>
+              <button class="pop-btn" type="button" style="background:#27272a; color:#ffffff; border:1px solid #52525b; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyKenBurnsToAll()" title="將此動畫預設套用至所有照片片段">全部套用</button>
             </div>
 
             <!-- 鏡頭運鏡軌跡 A➔B 與 運鏡時長 -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
-              <span style="font-size:0.72rem; font-weight:800; color:#c084fc; white-space:nowrap;">手動自訂:</span>
-              <button class="pop-btn" id="btn-set-point-a" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointA()" title="記錄起點 A">A點</button>
-              <button class="pop-btn" id="btn-set-point-b" style="background:#f0fdf4; color:#16a34a; border:1px solid #86efac; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointB()" title="記錄終點 B">B點</button>
-              <button class="pop-btn" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewABGlide()" title="預覽鏡頭推移">模擬AB</button>
+              <span style="font-size:0.72rem; font-weight:800; color:#a1a1aa; white-space:nowrap;">手動自訂:</span>
+              <button class="pop-btn" id="btn-set-point-a" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointA()" title="記錄起點 A">A點</button>
+              <button class="pop-btn" id="btn-set-point-b" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setPointB()" title="記錄終點 B">B點</button>
+              <button class="pop-btn" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewABGlide()" title="預覽鏡頭推移">模擬AB</button>
               <span id="cam-ab-status" style="display:none;"></span>
               <div style="display:inline-flex; align-items:center; gap:4px; margin-left:auto;">
                 <span style="font-size:0.68rem; color:#94a3b8;">運鏡時長:</span>
-                <span style="font-size:0.72rem; font-weight:800; color:#38bdf8;" id="val-glide-speed">1.0s</span>
+                <span style="font-size:0.72rem; font-weight:800; color:#ffffff;" id="val-glide-speed">1.0s</span>
                 <input type="range" id="slider-glide-speed" min="0.3" max="3.0" step="0.1" value="1.0" style="width:55px;" oninput="updateGlideSpeed(this.value)">
               </div>
             </div>
           </div>
 
-          <!-- 3️⃣ 滑鼠游標與點擊專區 (青綠色系，純淨俐落) -->
-          <div style="background:#0f172a; border:1px solid #134e4a; border-left:4px solid #14b8a6; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
+          <!-- [已隱藏滑鼠專區] -->
+          <div style="display:none !important; background:#18181b; border:1px solid #27272a; border-left:3px solid #71717a; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; box-shadow:0 2px 8px rgba(0,0,0,0.25);">
             <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:4px;">
-              <span style="font-size:0.75rem; font-weight:900; color:#5eead4; display:flex; align-items:center; gap:5px;">
+              <span style="font-size:0.75rem; font-weight:900; color:#a1a1aa; display:flex; align-items:center; gap:5px;">
                 3 滑鼠軌跡與點擊
               </span>
               <div style="display:flex; align-items:center; gap:5px;">
@@ -2244,13 +2482,13 @@
             <!-- 滑鼠軌跡 A➔B -->
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #042f2e; padding-top:4px;">
               <span style="font-size:0.72rem; font-weight:800; color:#22d3ee; white-space:nowrap;">滑鼠軌跡:</span>
-              <button class="pop-btn" id="btn-cursor-set-a" style="background:#ecfdf5; color:#059669; border:1px solid #a7f3d0; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointA()" title="拖曳至起點後記錄">A點</button>
-              <button class="pop-btn" id="btn-cursor-set-b" style="background:#f0fdf4; color:#16a34a; border:1px solid #86efac; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointB()" title="拖曳至目標點後記錄">B點</button>
-              <button class="pop-btn" style="background:#fef3c7; color:#b45309; border:1px solid #fcd34d; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewCursorABGlide()" title="預覽滑行與點擊">模擬AB</button>
+              <button class="pop-btn" id="btn-cursor-set-a" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointA()" title="拖曳至起點後記錄">A點</button>
+              <button class="pop-btn" id="btn-cursor-set-b" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="setCursorPointB()" title="拖曳至目標點後記錄">B點</button>
+              <button class="pop-btn" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; font-weight:800; padding:2px 8px; font-size:0.7rem; border-radius:5px; cursor:pointer;" onclick="previewCursorABGlide()" title="預覽滑行與點擊">模擬AB</button>
               <span id="cursor-ab-status" style="display:none;"></span>
               <div style="display:inline-flex; align-items:center; gap:4px; margin-left:auto;">
                 <span style="font-size:0.68rem; color:#94a3b8;">移動時長:</span>
-                <span style="font-size:0.72rem; font-weight:800; color:#38bdf8;" id="val-cursor-duration">0.8s</span>
+                <span style="font-size:0.72rem; font-weight:800; color:#ffffff;" id="val-cursor-duration">0.8s</span>
                 <input type="range" id="slider-cursor-duration" min="0.1" max="5.0" step="0.1" value="0.8" style="width:55px;" oninput="updateCursorDuration(this.value)" onchange="previewCursorABGlide()" title="調整滑鼠 A 到 B 移動時長 (0.1s~5.0s，放開即自動試播)">
               </div>
             </div>
@@ -2262,7 +2500,7 @@
               <span style="font-size:0.75rem; font-weight:800; color:#cbd5e1;">旁白解說詞</span>
               <div style="display:flex; align-items:center; gap:6px;">
                 <span style="font-size:0.68rem; color:#94a3b8;">比例:</span>
-                <select id="select-sub-size" onchange="changeSubtitleSize(this.value)" style="background:#020617; border:1px solid #334155; color:#38bdf8; font-size:0.7rem; border-radius:4px; padding:1px 4px; cursor:pointer; font-weight:700;">
+                <select id="select-sub-size" onchange="changeSubtitleSize(this.value)" style="background:#020617; border:1px solid #334155; color:#ffffff; font-size:0.7rem; border-radius:4px; padding:1px 4px; cursor:pointer; font-weight:700;">
                   <option value="small" selected>精緻 (推薦)</option>
                   <option value="medium">標準</option>
                   <option value="large">偏大</option>
@@ -2279,11 +2517,11 @@
         <div class="pop-tab-panel" id="tab-panel-speech" style="display:none; flex-direction:column; gap:10px;">
           <div class="pop-zone-card" style="background:#0f172a; border:1.5px solid #334155; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:8px;">
             <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #1e293b; padding-bottom:6px;">
-              <span style="font-size:0.8rem; font-weight:800; color:#38bdf8; display:flex; align-items:center; gap:6px;">
+              <span style="font-size:0.8rem; font-weight:800; color:#ffffff; display:flex; align-items:center; gap:6px;">
                 💬 當前片段旁白台詞 (全部完整顯示)
               </span>
               <div style="display:flex; align-items:center; gap:8px;">
-                <button type="button" class="pop-btn" onclick="insertHighlightTag('edit-sub-input')" style="padding:2px 8px; font-size:0.68rem; background:#0369a1; color:#e0f2fe; border:1px solid #0284c7; border-radius:5px; font-weight:800; cursor:pointer;" title="將選中文字或游標處加上『重點』高亮標籤">
+                <button type="button" class="pop-btn" onclick="insertHighlightTag('edit-sub-input')" style="padding:2px 8px; font-size:0.68rem; background:#27272a; color:#ffffff; border:1px solid #52525b; border-radius:5px; font-weight:800; cursor:pointer;" title="將選中文字或游標處加上『重點』高亮標籤">
                   ✨ 插入『重點』標籤
                 </button>
                 <span id="sub-char-count" style="font-size:0.7rem; color:#94a3b8; font-weight:700;">0 字</span>
@@ -2297,7 +2535,7 @@
               onblur="this.style.borderColor='#334155'"></textarea>
             <div style="font-size:0.7rem; color:#64748b; display:flex; justify-content:space-between;">
               <span>💡 提示：使用 <b>『重點詞』</b> 符號可自動套用高亮黃色膠囊效果</span>
-              <span style="color:#38bdf8;">長文自動撐開，絕不截斷</span>
+              <span style="color:#ffffff;">長文自動撐開，絕不截斷</span>
             </div>
           </div>
         </div>
@@ -2425,14 +2663,14 @@
       <!-- 專業時間軸刻度尺規條 (一眼看清總片長、當前時間點與圖片秒數) -->
       <div class="capcut-ruler-bar" id="capcut-ruler-bar">
         <div style="display:flex; align-items:center; gap:8px;">
-          <span style="color:#fde047; font-weight:800;">⏱️ 時間軸刻度尺</span>
+          <span style="color:#f4f4f5; font-weight:800;">⏱️ 時間軸刻度尺</span>
           <span>總片長: <b style="color:#ffffff;" id="ruler-total-time">02:58</b></span>
           <span style="color:#64748b;">|</span>
-          <span>共 <b style="color:#38bdf8;" id="ruler-clip-count">9</b> 個片段</span>
-          <span class="ruler-media-pill" onclick="toggleMediaOverviewModal(true)" title="點擊查看所有片段的圖片清單與結構">(含 <b style="color:#f472b6;" id="ruler-media-count">1</b> 張圖片 📋 點此查看總覽)</span>
+          <span>共 <b style="color:#ffffff;" id="ruler-clip-count">9</b> 個片段</span>
+          <span class="ruler-media-pill" onclick="toggleMediaOverviewModal(true)" title="點擊查看所有片段的圖片清單與結構">(含 <b style="color:#a1a1aa;" id="ruler-media-count">1</b> 張圖片 📋 點此查看總覽)</span>
         </div>
         <div style="display:flex; align-items:center; gap:6px;">
-          <button class="pop-btn" id="ruler-paste-btn" style="display:none; padding:1px 8px; font-size:0.7rem; background:#064e3b; color:#a7f3d0; border:1px solid #059669; font-weight:700;" onclick="pasteTimelineClip(currentSceneIdx, event)" title="貼上已複製的片段 (快捷鍵 Ctrl+V)">
+          <button class="pop-btn" id="ruler-paste-btn" style="display:none; padding:1px 8px; font-size:0.7rem; background:#064e3b; color:#a1a1aa; border:1px solid #059669; font-weight:700;" onclick="pasteTimelineClip(currentSceneIdx, event)" title="貼上已複製的片段 (快捷鍵 Ctrl+V)">
             📥 貼上片段
           </button>
           <!-- 🎵 背景配樂控制膠囊 -->
@@ -2442,11 +2680,11 @@
               <input type="file" id="bgm-file-input" accept="audio/*" style="display:none;" onchange="handleBgmFileSelect(event)">
             </label>
             <button type="button" class="pop-btn" id="btn-bgm-toggle" style="display:none; padding:1px 6px; font-size:0.68rem; background:#312e81; color:#e0e7ff; border:1px solid #4f46e5; border-radius:4px;" onclick="toggleBgmPlay(event)" title="試聽/暫停背景音樂">▶</button>
-            <button type="button" class="pop-btn" id="btn-bgm-remove" style="display:none; padding:1px 5px; font-size:0.68rem; background:#450a0a; color:#fca5a5; border:1px solid #ef4444; border-radius:4px;" onclick="removeBgm(event)" title="移除背景音樂">✕</button>
+            <button type="button" class="pop-btn" id="btn-bgm-remove" style="display:none; padding:1px 5px; font-size:0.68rem; background:#18181b; color:#71717a; border:1px solid #27272a; border-radius:4px;" onclick="removeBgm(event)" title="移除背景音樂">✕</button>
           </div>
 
-          <span style="color:#a7f3d0;">📍 當前播放:</span>
-          <span style="color:#facc15; font-weight:800; font-family:monospace;" id="ruler-current-timecode">片段 1 · 00:00 ~ 00:03 (3s)</span>
+          <span style="color:#a1a1aa;">📍 當前播放:</span>
+          <span style="color:#ffffff; font-weight:800; font-family:monospace;" id="ruler-current-timecode">片段 1 · 00:00 ~ 00:03 (3s)</span>
         </div>
       </div>
       <div class="timeline-track-rail" id="timeline-track-rail"></div>
@@ -2474,7 +2712,7 @@
       {
         "cam": [1.0, 0, 0],
         "box": [25.0, 25.0, 50.0, 50.0],
-        "hideBox": false,
+        "hideBox": true,
         "tag": "重點標籤",
         "sub": "歡迎使用影片編輯模版！這是您的第一個範例片段，所有素材來源皆指向『images/ 資料夾』，整包資料夾複製即可直接移動辦公！",
         "action": "highlight",
@@ -2507,7 +2745,7 @@
       {
         "cam": [1.0, 0, 0],
         "box": [25.0, 25.0, 50.0, 50.0],
-        "hideBox": false,
+        "hideBox": true,
         "tag": "重點標籤",
         "sub": "歡迎使用影片編輯模版！這是您的第一個範例片段，所有素材來源皆指向『images/ 資料夾』，整包資料夾複製即可直接移動辦公！",
         "action": "highlight",
@@ -3065,7 +3303,7 @@
     const curLeft = parseFloat(mockCursor.style.left) || 50;
     const curTop = parseFloat(mockCursor.style.top) || 50;
     step.fromCursorPos = [curLeft, curTop];
-    step.hideCursor = false;
+    step.hideCursor = true;
     mockCursor.classList.remove('is-hidden');
     mockCursor.classList.add('visible');
     updateCursorUIState();
@@ -3078,7 +3316,7 @@
     const curLeft = parseFloat(mockCursor.style.left) || 50;
     const curTop = parseFloat(mockCursor.style.top) || 50;
     step.cursorPos = [curLeft, curTop];
-    step.hideCursor = false;
+    step.hideCursor = true;
     mockCursor.classList.remove('is-hidden');
     mockCursor.classList.add('visible');
     updateCursorUIState();
@@ -4223,7 +4461,7 @@
             <div class="clip-time-pill ${isAct ? 'active-pill' : ''}" style="flex:1; height:20px; box-sizing:border-box; display:flex; align-items:center; justify-content:center; gap:3px; font-size:0.7rem; cursor:pointer;" title="點擊自訂秒數" onclick="promptSetClipDuration(${idx}, event)">
               ⏱️ ${info.duration}s
             </div>
-            <button type="button" class="clip-mini-btn" style="background:#312e81; color:#c7d2fe; border:1px solid #4f46e5; border-radius:4px; padding:0 5px; height:20px; font-size:0.68rem; font-weight:800; cursor:pointer; white-space:nowrap;" onclick="event.stopPropagation(); const presets=['zoom-in','zoom-out','pan-left','pan-right','diagonal','static']; const cur=sc.steps?.[0]?.fromCam ? 1 : 0; applyKenBurnsPreset(presets[(cur + 1) % presets.length], ${idx});" title="點擊輪換此照片的運鏡動畫">
+            <button type="button" class="clip-mini-btn" style="background:#27272a; color:#f4f4f5; border:1px solid #3f3f46; border-radius:4px; padding:0 5px; height:20px; font-size:0.68rem; font-weight:800; cursor:pointer; white-space:nowrap;" onclick="event.stopPropagation(); const presets=['zoom-in','zoom-out','pan-left','pan-right','diagonal','static']; const cur=sc.steps?.[0]?.fromCam ? 1 : 0; applyKenBurnsPreset(presets[(cur + 1) % presets.length], ${idx});" title="點擊輪換此照片的運鏡動畫">
               ${getClipPresetName(sc.steps?.[0])}
             </button>
           </div>
@@ -5344,8 +5582,8 @@
       const btn = document.getElementById('btn-aspect-' + r);
       if (!btn) return;
       const isAct = (r === ratio.replace(':', '-'));
-      btn.style.background = isAct ? '#0284c7' : 'transparent';
-      btn.style.color = isAct ? '#ffffff' : '#94a3b8';
+      btn.style.background = isAct ? '#ffffff' : 'transparent';
+      btn.style.color = isAct ? '#000000' : '#71717a';
     });
     updateScreenScale();
     if (typeof showScriptToast === 'function') {
@@ -5637,7 +5875,7 @@
     if (list) {
       list.innerHTML = rows.map((r, i) => `
         <div style="display:flex; align-items:center; gap:8px; font-size:0.72rem; padding:4px 8px; background:#0f172a; border-radius:6px; border:1px solid #1e293b;">
-          <span style="font-weight:900; color:#38bdf8; min-width:24px;">${String(i+1).padStart(2, '0')}</span>
+          <span style="font-weight:900; color:#ffffff; min-width:24px;">${String(i+1).padStart(2, '0')}</span>
           <span style="color:#fbbf24; min-width:90px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${r.imgPath}">🖼️ ${r.imgPath}</span>
           <span style="color:#94a3b8; min-width:40px;">⏱️ ${r.duration}s</span>
           <span style="color:#cbd5e1; flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${r.subtitle}">💬 ${r.subtitle || '(無旁白)'}</span>
@@ -5806,7 +6044,7 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
   <div class="live-modal-backdrop" id="modal-record-range" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:999999; align-items:center; justify-content:center;" onclick="if(event.target===this) closeRecordRangeModal()">
     <div style="width:480px; max-width:94vw; background:#0f172a; border:2px solid #38bdf8; border-radius:14px; box-shadow:0 20px 50px rgba(0,0,0,0.85); padding:22px; color:#f8fafc; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid #334155; padding-bottom:10px;">
-        <span style="font-size:1.12rem; font-weight:900; color:#38bdf8; display:flex; align-items:center; gap:8px;">
+        <span style="font-size:1.12rem; font-weight:900; color:#ffffff; display:flex; align-items:center; gap:8px;">
           🎥 選擇錄製影片範圍
         </span>
         <button style="background:transparent; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer; padding:0 4px;" onclick="closeRecordRangeModal()">✕</button>
@@ -5820,7 +6058,7 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
       <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:16px;">
         <!-- 選項 1 -->
         <label id="opt-range-stage" class="rec-range-option" style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#1e293b; border:2px solid #0284c7; border-radius:10px; cursor:pointer; transition:all 0.15s ease;" onclick="highlightRecordTarget('stage')">
-          <input type="radio" name="rec-range-choice" value="stage" checked style="margin-top:3px; accent-color:#38bdf8; cursor:pointer;">
+          <input type="radio" name="rec-range-choice" value="stage" checked style="margin-top:3px; accent-color:#ffffff; cursor:pointer;">
           <div style="flex:1;">
             <div style="display:flex; align-items:center; gap:8px;">
               <b style="color:#ffffff; font-size:0.95rem;">🎯 核心實機螢幕 (16:9 純淨畫面)</b>
@@ -5834,7 +6072,7 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
 
         <!-- 選項 2 -->
         <label id="opt-range-shell" class="rec-range-option" style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#1e293b; border:1.5px solid #334155; border-radius:10px; cursor:pointer; transition:all 0.15s ease;" onclick="highlightRecordTarget('shell')">
-          <input type="radio" name="rec-range-choice" value="shell" style="margin-top:3px; accent-color:#38bdf8; cursor:pointer;">
+          <input type="radio" name="rec-range-choice" value="shell" style="margin-top:3px; accent-color:#ffffff; cursor:pointer;">
           <div style="flex:1;">
             <b style="color:#ffffff; font-size:0.95rem;">📐 實機模擬視窗 (含 Mac 紅黃綠標題列)</b>
             <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px; line-height:1.4;">
@@ -5845,7 +6083,7 @@ images/02.jpg,這是系統主儀表板，即時監控全廠區滅火器與灑水
 
         <!-- 選項 3 -->
         <label id="opt-range-full" class="rec-range-option" style="display:flex; align-items:flex-start; gap:12px; padding:12px 14px; background:#1e293b; border:1.5px solid #334155; border-radius:10px; cursor:pointer; transition:all 0.15s ease;" onclick="highlightRecordTarget('full')">
-          <input type="radio" name="rec-range-choice" value="full" style="margin-top:3px; accent-color:#38bdf8; cursor:pointer;">
+          <input type="radio" name="rec-range-choice" value="full" style="margin-top:3px; accent-color:#ffffff; cursor:pointer;">
           <div style="flex:1;">
             <b style="color:#ffffff; font-size:0.95rem;">🖥️ 整個分頁 / 視窗 (全螢幕不裁切)</b>
             <div style="font-size:0.75rem; color:#94a3b8; margin-top:3px; line-height:1.4;">
