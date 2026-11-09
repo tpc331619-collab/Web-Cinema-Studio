@@ -1785,6 +1785,7 @@
     z-index: 80;
     display: none !important;
     opacity: 0;
+    transition: box-shadow 0.25s ease, border-color 0.2s ease;
   }
   .pop-focus-box.visible {
     display: block !important;
@@ -1804,8 +1805,9 @@
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
     pointer-events: none;
   }
-  #focus-box.spotlight-active {
-    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.6) !important;
+  #focus-box.spotlight-active,
+  .spotlight-active #focus-box {
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.72), 0 0 24px rgba(239, 68, 68, 0.8), inset 0 0 12px rgba(239, 68, 68, 0.2) !important;
   }
 
   /* 片段轉場特效動畫 (Clip Transitions) */
@@ -2650,8 +2652,8 @@
                 1 指示框與標籤
               </span>
               <div style="display:flex; align-items:center; gap:5px;">
-                <button class="pop-btn" id="btn-toggle-spotlight" style="padding:2px 8px; font-size:0.68rem; font-weight:800; border:1px solid #475569; background:#1e293b; color:#cbd5e1; border-radius:5px; cursor:pointer;" onclick="toggleSpotlight()">聚光燈：關</button>
-                <button class="pop-btn" id="btn-box-style-toolbar" style="padding:2px 8px; font-size:0.68rem; background:#371b1b; color:#fecaca; border:1px solid #b91c1c; font-weight:800; border-radius:5px; cursor:pointer;" onclick="toggleBoxStyleToolbar()" title="展開色彩、粗細與標籤樣式微調">外觀樣式與色彩</button>
+                <button class="pop-btn" id="btn-toggle-spotlight" style="padding:2px 8px; font-size:0.68rem; font-weight:800; border:1px solid #475569; background:#1e293b; color:#cbd5e1; border-radius:5px; cursor:pointer;" onclick="toggleSpotlight()">··· 聚光燈：關</button>
+                <button class="pop-btn" id="btn-box-style-toolbar" style="padding:2px 8px; font-size:0.68rem; background:#1e293b; color:#94a3b8; border:1px solid #475569; font-weight:800; border-radius:5px; cursor:pointer;" onclick="toggleBoxStyleToolbar()" title="展開色彩、粗細與標籤樣式微調">外觀樣式與色彩</button>
               </div>
             </div>
 
@@ -2662,8 +2664,8 @@
               <input type="text" id="edit-tag-input" class="pop-edit-input" style="flex:1; min-width:130px; padding:4px 8px; font-size:0.76rem; border:1px solid #475569; border-radius:5px; background:#020617; color:#f8fafc; outline:none;" oninput="handleTagEdited(this.value)" placeholder="例：🎯 重點提示標籤">
             </div>
 
-            <!-- 外觀樣式折疊面板 (完整微調：框線色、粗細、標籤底色、字色、字級大小、標籤位置) -->
-            <div id="box-style-toolbar" style="display:none; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:7px 10px; display:flex; flex-direction:column; gap:6px; font-size:0.72rem;">
+            <!-- 外觀樣式折疊面板 (預設收合，完整微調：框線色、粗細、標籤底色、字色、字級大小、標籤位置) -->
+            <div id="box-style-toolbar" style="display:none; background:#1e293b; border:1px solid #334155; border-radius:8px; padding:7px 10px; flex-direction:column; gap:6px; font-size:0.72rem;">
               <!-- 第一列：外框線顏色與粗細、位置 -->
               <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
                 <span style="font-weight:800; color:#e2e8f0;">框線色:</span>
@@ -3359,8 +3361,10 @@
     const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
     if (!step || step.hideBox || !box || !box.w || !box.h || box.w === 0 || box.h === 0) {
       if (focusBox) {
-        focusBox.classList.remove('visible');
+        focusBox.classList.remove('visible', 'spotlight-active');
         focusBox.style.display = 'none';
+        const stage = document.getElementById('stage-viewport');
+        if (stage) stage.classList.remove('spotlight-active');
       }
       return;
     }
@@ -4081,7 +4085,7 @@
     const spotBtn = document.getElementById('btn-toggle-spotlight');
 
     if (spotBtn && step) {
-      spotBtn.innerHTML = step.spotlight ? '🔦 聚光燈：開' : '🔦 聚光燈：關';
+      spotBtn.innerHTML = step.spotlight ? '🔦 聚光燈：開' : '··· 聚光燈：關';
       spotBtn.style.background = step.spotlight ? '#854d0e' : '#1e293b';
       spotBtn.style.color = step.spotlight ? '#fef08a' : '#cbd5e1';
       spotBtn.style.borderColor = step.spotlight ? '#eab308' : '#475569';
@@ -4093,9 +4097,11 @@
       input.value = step.tag || '';
     }
 
+    const stage = document.getElementById('stage-viewport');
     if (step.hideBox || !step.box) {
-      focusBox.classList.remove('visible');
+      focusBox.classList.remove('visible', 'spotlight-active');
       focusBox.style.display = 'none';
+      if (stage) stage.classList.remove('spotlight-active');
       if (btn) {
         btn.innerHTML = '紅框：已隱藏';
         btn.style.background = '#450a0a';
@@ -4113,7 +4119,7 @@
       }
     }
 
-    // 同步自訂樣式至指示框與左側控制項
+    // 同步自訂樣式至指示框與左側控制項 (包含聚光燈陰影)
     applyBoxStyleToDOM(step.boxStyle || {});
   }
 
@@ -4131,8 +4137,15 @@
 
   function toggleBoxStyleToolbar() {
     const p = document.getElementById('box-style-toolbar');
+    const b = document.getElementById('btn-box-style-toolbar');
     if (p) {
-      p.style.display = (p.style.display === 'none' || !p.style.display) ? 'flex' : 'none';
+      const isHidden = (p.style.display === 'none' || getComputedStyle(p).display === 'none');
+      p.style.display = isHidden ? 'flex' : 'none';
+      if (b) {
+        b.style.background = isHidden ? '#371b1b' : '#1e293b';
+        b.style.color = isHidden ? '#fecaca' : '#94a3b8';
+        b.style.borderColor = isHidden ? '#b91c1c' : '#475569';
+      }
     }
   }
 
@@ -4140,20 +4153,41 @@
     const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
     if (!step) return;
     step.spotlight = !step.spotlight;
-    const stage = document.getElementById('stage-viewport');
-    if (stage) stage.classList.toggle('spotlight-active', !!step.spotlight);
+    if (step.spotlight && step.hideBox) {
+      step.hideBox = false;
+      if (!step.box || !step.box[2] || !step.box[3]) {
+        step.box = [20.0, 20.0, 60.0, 60.0];
+      }
+    }
     updateBoxUIState();
+    const b = parseBox(step.box);
+    renderFocusBox(b, step.tag, 0.2);
     autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast(step.spotlight ? '🔦 聚光燈模式：已開啟' : '🔦 聚光燈模式：已關閉');
+    }
   }
 
   function applyBoxStyleToDOM(st = {}) {
     if (!focusBox) return;
+    const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
+    const isSpotlight = !!(step && step.spotlight && !step.hideBox && step.box);
     const borderColor = st.borderColor || '#ef4444';
     const borderWidth = st.borderWidth || '3.5px';
     focusBox.style.setProperty('border-color', borderColor, 'important');
     focusBox.style.setProperty('border-width', borderWidth, 'important');
     focusBox.style.setProperty('border-style', 'solid', 'important');
-    focusBox.style.setProperty('box-shadow', `0 0 16px ${borderColor}88, inset 0 0 10px ${borderColor}33`, 'important');
+
+    const stage = document.getElementById('stage-viewport');
+    if (isSpotlight) {
+      focusBox.style.setProperty('box-shadow', `0 0 0 9999px rgba(0, 0, 0, 0.72), 0 0 24px ${borderColor}cc, inset 0 0 12px ${borderColor}33`, 'important');
+      focusBox.classList.add('spotlight-active');
+      if (stage) stage.classList.add('spotlight-active');
+    } else {
+      focusBox.style.setProperty('box-shadow', `0 0 16px ${borderColor}88, inset 0 0 10px ${borderColor}33`, 'important');
+      focusBox.classList.remove('spotlight-active');
+      if (stage) stage.classList.remove('spotlight-active');
+    }
 
     if (focusTag) {
       const tagBg = st.tagBg || borderColor;
@@ -5506,11 +5540,22 @@
     const mw = docClone.querySelector('#motion-world');
     if (mw) mw.setAttribute('style', 'transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1); transform: scale(1) translate(0%, 0%);');
     const fb = docClone.querySelector('#focus-box');
-    if (fb) fb.setAttribute('style', 'transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1), top 0.8s cubic-bezier(0.22, 1, 0.36, 1), width 0.8s, height 0.8s, opacity 0.3s;');
+    if (fb) {
+      fb.setAttribute('style', 'transition: left 0.8s cubic-bezier(0.22, 1, 0.36, 1), top 0.8s cubic-bezier(0.22, 1, 0.36, 1), width 0.8s, height 0.8s, opacity 0.3s;');
+      fb.classList.remove('spotlight-active');
+    }
     const mc = docClone.querySelector('#mock-cursor');
     if (mc) mc.removeAttribute('style');
     const sw = docClone.querySelector('.pop-subtitle-wrap');
     if (sw) sw.removeAttribute('style');
+    const bst = docClone.querySelector('#box-style-toolbar');
+    if (bst) bst.style.display = 'none';
+    const bstb = docClone.querySelector('#btn-box-style-toolbar');
+    if (bstb) {
+      bstb.style.background = '#1e293b';
+      bstb.style.color = '#94a3b8';
+      bstb.style.borderColor = '#475569';
+    }
 
     return docClone.outerHTML;
   }
