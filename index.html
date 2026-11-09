@@ -2746,7 +2746,7 @@
             <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; border-top:1px dashed #2e1065; padding-top:4px;">
               <span style="font-size:0.72rem; font-weight:800; color:#ffffff; white-space:nowrap;">🎨 色彩風格:</span>
               <select id="select-filter-preset" onchange="applyFilterPreset(this.value)" style="background:#18181b; color:#f4f4f5; border:1px solid #3f3f46; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
-                <option value="none">🌈 自然原色 (Natural)</option>
+                <option value="none">🌈 自然原色 (無濾鏡 · 恢復原圖)</option>
                 <option value="vintage">🎞️ 復古底片 (Warm Vintage)</option>
                 <option value="teal-orange">🎬 電影青橙 (Teal & Orange)</option>
                 <option value="golden">🌅 晨曦暖調 (Golden Hour)</option>
@@ -2761,6 +2761,7 @@
               <span style="font-size:0.72rem; font-weight:800; color:#a1a1aa; white-space:nowrap;">🎬 動畫預設:</span>
               <select id="select-kenburns-preset" onchange="applyKenBurnsPreset(this.value)" style="background:#18181b; color:#f4f4f5; border:1px solid #3f3f46; border-radius:5px; font-size:0.72rem; font-weight:800; padding:2px 6px; cursor:pointer;">
                 <option value="">⚡ 選擇經典照片運鏡...</option>
+                <option value="none">⏹️ 無運鏡 (恢復原本靜態畫面)</option>
                 <option value="zoom-in">🔍 慢速推近 (Zoom In)</option>
                 <option value="zoom-out">🔎 特寫拉遠 (Zoom Out)</option>
                 <option value="pan-left">⬅️ 全景向左平移 (Pan Left)</option>
@@ -2768,7 +2769,6 @@
                 <option value="tilt-up">⬆️ 由下往上推 (Tilt Up)</option>
                 <option value="tilt-down">⬇️ 由上往下移 (Tilt Down)</option>
                 <option value="diagonal">↗️ 傾角推鏡 (Diagonal Zoom)</option>
-                <option value="static">⏹️ 靜止畫面 (Static)</option>
               </select>
               <button class="pop-btn" type="button" style="background:#27272a; color:#ffffff; border:1px solid #52525b; font-weight:800; padding:2px 7px; font-size:0.68rem; border-radius:5px; cursor:pointer;" onclick="applyKenBurnsToAll()" title="將此動畫預設套用至所有照片片段">全部套用</button>
             </div>
@@ -4049,9 +4049,17 @@
   function resetCameraCenter() {
     const step = SCENES[currentSceneIdx]?.steps[currentStepIdx];
     if (!step) return;
+    delete step.fromCam;
+    delete step.kenBurnsPreset;
     step.cam = [1.0, 0, 0];
     applyCamTransform(0.3);
+    const sel = document.getElementById('select-kenburns-preset');
+    if (sel) sel.value = '';
+    renderTimelineRail();
     autoSaveToStorage();
+    if (typeof showScriptToast === 'function') {
+      showScriptToast('鏡頭與運鏡已重設歸位 (1.00x 原始置中)');
+    }
   }
 
   function updateGlideSpeed(val) {
@@ -4603,6 +4611,8 @@
     }
     const filterSel = document.getElementById('select-filter-preset');
     if (filterSel) filterSel.value = scene.colorFilter || 'none';
+    const kenSel = document.getElementById('select-kenburns-preset');
+    if (kenSel) kenSel.value = step.kenBurnsPreset || (step.fromCam ? '' : 'none');
     }
 
     // 運鏡相機 (支援純照片平滑 Ken Burns 運鏡)
@@ -6189,43 +6199,69 @@
   function applyFilterPreset(preset, targetIdx = currentSceneIdx) {
     const scene = SCENES[targetIdx];
     if (!scene) return;
-    scene.colorFilter = preset || 'none';
+    const finalPreset = (!preset || preset === 'none') ? 'none' : preset;
+    scene.colorFilter = finalPreset;
 
     // 應用在 DOM 節點上
-    const screenEl = document.getElementById(scene.screen);
+    const screenEl = document.getElementById(scene.screen) || document.querySelector('.pop-screen-item.active') || document.querySelector('.pop-screen-item');
     if (screenEl) {
       screenEl.classList.remove('filter-vintage', 'filter-teal-orange', 'filter-monochrome', 'filter-golden', 'filter-cold');
-      if (preset && preset !== 'none') {
-        screenEl.classList.add('filter-' + preset);
+      if (finalPreset !== 'none') {
+        screenEl.classList.add('filter-' + finalPreset);
       }
+    }
+
+    const sel = document.getElementById('select-filter-preset');
+    if (sel && targetIdx === currentSceneIdx) {
+      sel.value = finalPreset;
     }
 
     if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
     if (targetIdx === currentSceneIdx && typeof showScriptToast === 'function') {
-      showScriptToast(`已套用相片色調: ${preset}`);
+      showScriptToast(finalPreset === 'none' ? '已恢復自然原色 (無濾鏡)' : `已套用相片色調: ${finalPreset}`);
     }
   }
 
   function applyFilterToAll() {
     const sel = document.getElementById('select-filter-preset');
     const preset = sel ? sel.value : 'none';
-    SCENES.forEach((s, idx) => {
+    SCENES.forEach((_, idx) => {
       applyFilterPreset(preset, idx);
     });
     if (typeof showScriptToast === 'function') {
-      showScriptToast(`已將 [${preset}] 色彩風格批次套用至全片！`);
+      showScriptToast(preset === 'none' ? '已將全部照片恢復自然原色！' : `已將 [${preset}] 色彩風格批次套用至全片！`);
     }
   }
 
   function applyKenBurnsPreset(preset, targetSceneIdx = currentSceneIdx) {
-    if (!preset) return;
     const scene = SCENES[targetSceneIdx];
     if (!scene || !scene.steps || !scene.steps[0]) return;
     const step = scene.steps[0];
     const dur = parseFloat(scene.duration || 3.0);
 
-    // step.hideBox = true;
-    // step.hideCursor = true;
+    // 若選擇恢復原狀 / 無運鏡
+    if (!preset || preset === 'none') {
+      delete step.fromCam;
+      delete step.kenBurnsPreset;
+      step.cam = [1.0, 0, 0];
+      step.motionDuration = 0.5;
+      if (targetSceneIdx === currentSceneIdx) {
+        motionWorld.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+        motionWorld.style.transform = 'scale(1) translate(0%, 0%)';
+        const zoomVal = document.getElementById('val-cam-zoom');
+        if (zoomVal) zoomVal.textContent = '1.00x';
+        const sel = document.getElementById('select-kenburns-preset');
+        if (sel) sel.value = '';
+      }
+      renderTimelineRail();
+      if (typeof autoSaveToStorage === 'function') autoSaveToStorage();
+      if (targetSceneIdx === currentSceneIdx && typeof showScriptToast === 'function') {
+        showScriptToast('已恢復原始靜態畫面 (無運鏡)');
+      }
+      return;
+    }
+
+    step.kenBurnsPreset = preset;
     step.motionDuration = dur;
 
     switch (preset) {
@@ -6258,7 +6294,7 @@
         step.cam = [1.28, -5, -5];
         break;
       case 'static':
-        step.fromCam = [1.0, 0, 0];
+        delete step.fromCam;
         step.cam = [1.0, 0, 0];
         break;
     }
@@ -6270,7 +6306,14 @@
 
     renderTimelineRail();
     if (targetSceneIdx === currentSceneIdx) {
-      previewABGlide();
+      if (preset === 'static') {
+        motionWorld.style.transition = 'transform 0.5s cubic-bezier(0.22, 1, 0.36, 1)';
+        motionWorld.style.transform = 'scale(1) translate(0%, 0%)';
+        const zoomVal = document.getElementById('val-cam-zoom');
+        if (zoomVal) zoomVal.textContent = '1.00x';
+      } else {
+        previewABGlide();
+      }
     }
     if (typeof showScriptToast === 'function') {
       showScriptToast(`已為片段 ${targetSceneIdx + 1} 套用 [${preset}] 運鏡！`);
@@ -6279,16 +6322,12 @@
 
   function applyKenBurnsToAll() {
     const sel = document.getElementById('select-kenburns-preset');
-    const preset = sel ? sel.value : 'zoom-in';
-    if (!preset) {
-      alert('請先在下拉選單中選擇一種運鏡效果！');
-      return;
-    }
+    const preset = sel ? sel.value : '';
     SCENES.forEach((_, idx) => {
-      applyKenBurnsPreset(preset, idx);
+      applyKenBurnsPreset(preset || 'none', idx);
     });
     if (typeof showScriptToast === 'function') {
-      showScriptToast(`已將 [${preset}] 批次套用至全部 ${SCENES.length} 個照片片段！`);
+      showScriptToast((!preset || preset === 'none') ? '已將全部片段運鏡重設為靜態畫面！' : `已將 [${preset}] 批次套用至全部 ${SCENES.length} 個照片片段！`);
     }
   }
 
