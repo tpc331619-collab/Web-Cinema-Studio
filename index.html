@@ -3880,7 +3880,7 @@
       applyCamTransform(duration);
       const b = parseBox(step.box);
       renderFocusBox(b, step.tag, duration);
-      animateMockCursor(b, step.action);
+      animateMockCursor(b, step.action, null, true);
     }, 150);
   }
 
@@ -4087,8 +4087,9 @@
     setTimeout(() => { ripple.remove(); }, 620);
   }
 
-  // 播放與步驟載入時游標動畫演算法 (支援 A→B 滑行)
-  function animateMockCursor(targetBox, action = null, motionDuration = null) {
+  // 播放與步驟載入時游標動畫演算法 (支援 A→B 滑行；非播放中預設不主動動畫)
+  function animateMockCursor(targetBox, action = null, motionDuration = null, forceAnimate = false) {
+    if (!isPlaying && !forceAnimate) return;
     const step = SCENES[currentSceneIdx]?.steps?.[currentStepIdx];
     if (!mockCursor) return;
 
@@ -4774,26 +4775,41 @@
     if (kenSel) kenSel.value = step.kenBurnsPreset || (step.fromCam ? '' : 'none');
     }
 
-    // 運鏡相機 (支援純照片平滑 Ken Burns 運鏡)
+    // 運鏡相機與動畫控制 (嚴格遵循：未按播放鍵時絕對靜態，絕不自動播放)
     const duration = parseFloat(step.motionDuration || scene.duration || 1.0);
-    if (!step.hideCursor && mockCursor) {
-      const pointA = step.fromCursorPos || step.cursorA;
-      if (pointA && Array.isArray(pointA)) {
-        mockCursor.style.transition = 'none';
-        mockCursor.style.left = pointA[0] + '%';
-        mockCursor.style.top = pointA[1] + '%';
-        void mockCursor.offsetWidth;
-      }
-    }
-    if (step.fromCam) {
-      motionWorld.style.transition = 'none';
-      if (focusBox) focusBox.style.transition = 'none';
-      const [zA, pxA, pyA] = step.fromCam;
-      motionWorld.style.transform = `scale(${zA}) translate(${pxA}%, ${pyA}%)`;
-      if (step.fromBox && !step.hideBox) renderFocusBox(parseBox(step.fromBox), step.tag, 0);
-      void motionWorld.offsetWidth;
+    const rawSub = step.sub || (scene.subtitles && scene.subtitles[currentStepIdx]) || scene.title || '';
 
-      setTimeout(() => {
+    if (isPlaying) {
+      // === 播放進行中：動態運鏡、滑鼠滑行點擊、KTV 逐字展開 ===
+      if (!step.hideCursor && mockCursor) {
+        const pointA = step.fromCursorPos || step.cursorA;
+        if (pointA && Array.isArray(pointA)) {
+          mockCursor.style.transition = 'none';
+          mockCursor.style.left = pointA[0] + '%';
+          mockCursor.style.top = pointA[1] + '%';
+          void mockCursor.offsetWidth;
+        }
+      }
+      if (step.fromCam) {
+        motionWorld.style.transition = 'none';
+        if (focusBox) focusBox.style.transition = 'none';
+        const [zA, pxA, pyA] = step.fromCam;
+        motionWorld.style.transform = `scale(${zA}) translate(${pxA}%, ${pyA}%)`;
+        if (step.fromBox && !step.hideBox) renderFocusBox(parseBox(step.fromBox), step.tag, 0);
+        void motionWorld.offsetWidth;
+
+        setTimeout(() => {
+          if (!isPlaying) return;
+          applyCamTransform(duration);
+          if (!step.hideBox && step.box) {
+            const b = parseBox(step.box);
+            renderFocusBox(b, step.tag, duration);
+          } else if (focusBox) {
+            focusBox.style.display = 'none';
+          }
+          if (!step.hideCursor) animateMockCursor(parseBox(step.box), step.action, null, true);
+        }, 50);
+      } else {
         applyCamTransform(duration);
         if (!step.hideBox && step.box) {
           const b = parseBox(step.box);
@@ -4801,26 +4817,52 @@
         } else if (focusBox) {
           focusBox.style.display = 'none';
         }
-        if (!step.hideCursor) animateMockCursor(parseBox(step.box), step.action);
-      }, 50);
-    } else {
-      applyCamTransform(duration);
-      if (!step.hideBox && step.box) {
-        const b = parseBox(step.box);
-        renderFocusBox(b, step.tag, duration);
-      } else if (focusBox) {
-        focusBox.style.display = 'none';
+        if (!step.hideCursor) animateMockCursor(parseBox(step.box), step.action, null, true);
       }
-      if (!step.hideCursor) animateMockCursor(parseBox(step.box), step.action);
-    }
 
-    // 字幕
-    const rawSub = step.sub || (scene.subtitles && scene.subtitles[currentStepIdx]) || scene.title || '';
-    if (isPlaying) {
+      // 字幕
       startKtvSubtitleReveal(rawSub, () => {
         if (isPlaying) nextStep();
       });
     } else {
+      // === 靜止/編輯狀態：零動態，無動畫過渡，無滑鼠移動，無音效，純靜態顯示 ===
+      motionWorld.style.transition = 'none';
+      if (step.fromCam) {
+        const [zA, pxA, pyA] = step.fromCam;
+        motionWorld.style.transform = `scale(${zA}) translate(${pxA}%, ${pyA}%)`;
+      } else {
+        const [z, px, py] = step.cam || [1, 0, 0];
+        motionWorld.style.transform = `scale(${z}) translate(${px}%, ${py}%)`;
+      }
+      const curZ = step.fromCam ? step.fromCam[0] : (step.cam ? step.cam[0] : 1.0);
+      const valCamZoom = document.getElementById('val-cam-zoom');
+      if (valCamZoom) valCamZoom.textContent = (curZ || 1).toFixed(2) + 'x';
+
+      if (!step.hideBox && (step.fromBox || step.box)) {
+        const b = parseBox(step.fromBox || step.box);
+        renderFocusBox(b, step.tag, 0);
+      } else if (focusBox) {
+        focusBox.style.display = 'none';
+        focusBox.classList.remove('visible', 'spotlight-active');
+      }
+
+      if (mockCursor) {
+        mockCursor.style.transition = 'none';
+        mockCursor.classList.remove('clicking');
+        if (step.hideCursor) {
+          mockCursor.classList.remove('visible');
+          mockCursor.classList.add('is-hidden');
+          mockCursor.style.display = 'none';
+        } else {
+          mockCursor.classList.remove('is-hidden');
+          mockCursor.classList.add('visible');
+          mockCursor.style.display = 'block';
+          const p = step.fromCursorPos || step.cursorA || step.cursorPos || step.cursorB || [50, 50];
+          mockCursor.style.left = p[0] + '%';
+          mockCursor.style.top = p[1] + '%';
+        }
+      }
+
       stopTypewriter(false);
       if (subtitleText) {
         subtitleText.innerHTML = formatSubtitle(rawSub);
@@ -4858,7 +4900,13 @@
     }
   }
 
+  let isSingleClipPlay = false;
+
   function nextStep() {
+    if (isSingleClipPlay) {
+      pausePlayback();
+      return;
+    }
     const scene = SCENES[currentSceneIdx];
     if (scene && scene.steps && currentStepIdx + 1 < scene.steps.length) {
       loadStep(currentSceneIdx, currentStepIdx + 1, true);
@@ -4875,6 +4923,7 @@
     if (isPlaying) {
       pausePlayback();
     } else {
+      isSingleClipPlay = false;
       startPlayback();
     }
   }
@@ -4887,6 +4936,7 @@
       playBtn.style.background = '#fed7aa';
       playBtn.style.color = '#9a3412';
     }
+    renderTimelineRail();
     if (ktvTypingState && resumeTypewriter()) {
       return;
     }
@@ -4896,6 +4946,7 @@
   function pausePlayback() {
     syncBgmWithPlayback(false);
     isPlaying = false;
+    isSingleClipPlay = false;
     stopTypewriter(true);
     if (playBtn) {
       playBtn.textContent = '▶ 播放';
@@ -4907,10 +4958,12 @@
       clearTimeout(playTimer);
       playTimer = null;
     }
+    renderTimelineRail();
   }
 
   function restartPlaybackFromBeginning() {
     pausePlayback();
+    isSingleClipPlay = false;
     currentElapsedSec = 0;
     updateTimecodeUI(0);
     loadStep(0, 0, false);
@@ -4921,11 +4974,11 @@
     if (event) event.stopPropagation();
     if (isPlaying && currentSceneIdx === idx) {
       pausePlayback();
-      renderTimelineRail();
     } else {
+      pausePlayback();
+      isSingleClipPlay = true;
       loadStep(idx, 0, false);
       startPlayback();
-      renderTimelineRail();
     }
   }
 
@@ -5066,6 +5119,7 @@
   
   // === 專業相片動畫：外部多張照片批次拖放匯入 (Smart Photo Batch Flow) ===
   async function handleBatchFilesDrop(fileList) {
+    pausePlayback();
     const files = Array.from(fileList).filter(f => f.type.startsWith('image/') || /\.(jpe?g|png|webp|gif|bmp)$/i.test(f.name));
     if (files.length === 0) return;
 
